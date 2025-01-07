@@ -14,7 +14,7 @@ class UserObserver
     {
         if($user->type=='admin')
         {
-            $user->assignRole('super-admin');
+            $user->assignRole('super_admin');
         }elseif ($user->type=='courier')
         {
             $user->assignRole('courier');

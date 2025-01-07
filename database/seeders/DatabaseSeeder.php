@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        Artisan::call('shield:install admin');
+        Artisan::call('shield:generate --all --panel=admin');
         \App\Models\User::create([
             'name'=>'Abdo Shrief',
             'phone'=>'01270989676',
@@ -23,8 +25,6 @@ class DatabaseSeeder extends Seeder
             'password'=>\Illuminate\Support\Facades\Hash::make('12345678'),
             'active'=>true
         ]);
-        Artisan::call('shield:install admin');
-        Artisan::call('shield:generate --all --panel=admin');
         Artisan::call('shield:super-admin --user=1');
         \Spatie\Permission\Models\Role::create(['name'=>'manager', 'guard_name'=>'web']);
         \Spatie\Permission\Models\Role::create(['name'=>'courier', 'guard_name'=>'web']);
