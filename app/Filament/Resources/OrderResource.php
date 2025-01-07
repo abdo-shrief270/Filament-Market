@@ -290,6 +290,7 @@ class OrderResource extends Resource
                 }),
 
             Forms\Components\Select::make('courier_id')
+                ->label('Delivery Man')
                 ->relationship('courier', 'name')
                 ->required(),
             Forms\Components\Select::make('discount_type')
