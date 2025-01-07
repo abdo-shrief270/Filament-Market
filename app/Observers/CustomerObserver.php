@@ -13,8 +13,9 @@ class CustomerObserver
     public function created(Customer $customer): void
     {
         Notification::make()
-            ->title('Customer : '.$customer->name)
-            ->body('Customer Created successfully by :'.auth()->user()->name)
+            ->title(__('Customer') . ' : '.$customer->name)
+            ->icon('heroicon-o-user-group')
+            ->body(__('Customer Created successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -25,8 +26,9 @@ class CustomerObserver
     public function updated(Customer $customer): void
     {
         Notification::make()
-            ->title('Customer : '.$customer->name)
-            ->body('Customer updated successfully by :'.auth()->user()->name)
+            ->title(__('Customer') . ' : '.$customer->name)
+            ->icon('heroicon-o-user-group')
+            ->body(__('Customer updated successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -37,8 +39,9 @@ class CustomerObserver
     public function deleted(Customer $customer): void
     {
         Notification::make()
-            ->title('Customer : '.$customer->name)
-            ->body('Customer deleted successfully by :'.auth()->user()->name)
+            ->title(__('Customer') . ' : '.$customer->name)
+            ->icon('heroicon-o-user-group')
+            ->body(__('Customer deleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -49,8 +52,9 @@ class CustomerObserver
     public function restored(Customer $customer): void
     {
         Notification::make()
-            ->title('Customer : '.$customer->name)
-            ->body('Customer restored successfully by : '.auth()->user()->name)
+            ->title(__('Customer') . ' : '.$customer->name)
+            ->icon('heroicon-o-user-group')
+            ->body(__('Customer restored successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -61,8 +65,9 @@ class CustomerObserver
     public function forceDeleted(Customer $customer): void
     {
         Notification::make()
-            ->title('Customer : '.$customer->name)
-            ->body('Customer forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('Customer') . ' : '.$customer->name)
+            ->icon('heroicon-o-user-group')
+            ->body(__('Customer forceDeleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

@@ -24,9 +24,9 @@ class OrderUpdated
             }else{
                 $total_price *= 1-($order->discount/100);
             }
-            $newOrder=Order::where('id',$order->id)->update(
+            Order::where('id',$order->id)->update(
                 [
-                    'total_price' => $total_price
+                    'total_price' => $total_price + $order->customer->city->shipping_cost
                 ]
             );
         }

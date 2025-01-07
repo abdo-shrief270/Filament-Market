@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('courier_id')->nullable()->constrained('users','id')->nullOnDelete();
             $table->bigInteger('last_courier_id')->nullable();
             $table->enum('order_status',['new','processing','shipped','delivered','cancelled']);
-            $table->text('notes');
             $table->softDeletes();
             $table->timestamps();
         });

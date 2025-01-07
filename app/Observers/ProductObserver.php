@@ -13,8 +13,9 @@ class ProductObserver
     public function created(Product $product): void
     {
         Notification::make()
-            ->title('Product : '.$product->name)
-            ->body('Product Created successfully by :'.auth()->user()->name)
+            ->title(__('Product') . ' : '.$product->name)
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->body(__('Product Created successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -25,8 +26,9 @@ class ProductObserver
     public function updated(Product $product): void
     {
         Notification::make()
-            ->title('Product : '.$product->name)
-            ->body('Product updated successfully by :'.auth()->user()->name)
+            ->title(__('Product') . ' : '.$product->name)
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->body(__('Product updated successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -37,8 +39,9 @@ class ProductObserver
     public function deleted(Product $product): void
     {
         Notification::make()
-            ->title('Product : '.$product->name)
-            ->body('Product deleted successfully by :'.auth()->user()->name)
+            ->title(__('Product') . ' : '.$product->name)
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->body(__('Product deleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -49,8 +52,9 @@ class ProductObserver
     public function restored(Product $product): void
     {
         Notification::make()
-            ->title('Product : '.$product->name)
-            ->body('Product restored successfully by : '.auth()->user()->name)
+            ->title(__('Product') . ' : '.$product->name)
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->body(__('Product restored successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -61,8 +65,9 @@ class ProductObserver
     public function forceDeleted(Product $product): void
     {
         Notification::make()
-            ->title('Product : '.$product->name)
-            ->body('Product forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('Product') . ' : '.$product->name)
+            ->icon('heroicon-o-square-3-stack-3d')
+            ->body(__('Product forceDeleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

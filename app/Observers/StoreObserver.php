@@ -13,8 +13,9 @@ class StoreObserver
     public function created(Store $store): void
     {
         Notification::make()
-            ->title('Store : '.$store->name)
-            ->body('Store Created successfully by :'.auth()->user()->name)
+            ->title(__('Store') . ' : '.$store->name)
+            ->icon('heroicon-o-building-storefront')
+            ->body(__('Store Created successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -25,8 +26,9 @@ class StoreObserver
     public function updated(Store $store): void
     {
         Notification::make()
-            ->title('Store : '.$store->name)
-            ->body('Store updated successfully by :'.auth()->user()->name)
+            ->title(__('Store') . ' : '.$store->name)
+            ->icon('heroicon-o-building-storefront')
+            ->body(__('Store updated successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -37,8 +39,9 @@ class StoreObserver
     public function deleted(Store $store): void
     {
         Notification::make()
-            ->title('Store : '.$store->name)
-            ->body('Store deleted successfully by :'.auth()->user()->name)
+            ->title(__('Store') . ' : '.$store->name)
+            ->icon('heroicon-o-building-storefront')
+            ->body(__('Store deleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -49,8 +52,9 @@ class StoreObserver
     public function restored(Store $store): void
     {
         Notification::make()
-            ->title('Store : '.$store->name)
-            ->body('Store restored successfully by : '.auth()->user()->name)
+            ->title(__('Store') . ' : '.$store->name)
+            ->icon('heroicon-o-building-storefront')
+            ->body(__('Store restored successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -61,8 +65,9 @@ class StoreObserver
     public function forceDeleted(Store $store): void
     {
         Notification::make()
-            ->title('Store : '.$store->name)
-            ->body('Store forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('Store') . ' : '.$store->name)
+            ->icon('heroicon-o-building-storefront')
+            ->body(__('Store forceDeleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

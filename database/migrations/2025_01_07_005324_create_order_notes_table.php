@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('zones', function (Blueprint $table) {
+        Schema::create('order_notes', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->foreignId('itinerary_id')->constrained()->cascadeOnDelete();
-            $table->softDeletes();
+            $table->foreignId('order_id')->constrained('orders','id')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users','id')->cascadeOnDelete();
+            $table->text('content');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('zones');
+        Schema::dropIfExists('notes');
     }
 };

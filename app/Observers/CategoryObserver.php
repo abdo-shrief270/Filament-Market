@@ -13,8 +13,9 @@ class CategoryObserver
     public function created(Category $category): void
     {
         Notification::make()
-            ->title('Category : '.$category->name)
-            ->body('Category Created successfully by :'.auth()->user()->name)
+            ->title(__('Category') . ' : '.$category->name)
+            ->icon('heroicon-o-tag')
+            ->body(__('Category Created successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -25,8 +26,9 @@ class CategoryObserver
     public function updated(Category $category): void
     {
         Notification::make()
-            ->title('Category : '.$category->name)
-            ->body('Category updated successfully by :'.auth()->user()->name)
+            ->title(__('Category') . ' : '.$category->name)
+            ->icon('heroicon-o-tag')
+            ->body(__('Category updated successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -37,8 +39,9 @@ class CategoryObserver
     public function deleted(Category $category): void
     {
         Notification::make()
-            ->title('Category : '.$category->name)
-            ->body('Category deleted successfully by :'.auth()->user()->name)
+            ->title(__('Category') . ' : '.$category->name)
+            ->icon('heroicon-o-tag')
+            ->body(__('Category deleted successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -49,8 +52,9 @@ class CategoryObserver
     public function restored(Category $category): void
     {
         Notification::make()
-            ->title('Category : '.$category->name)
-            ->body('Category restored successfully by : '.auth()->user()->name)
+            ->title(__('Category') . ' : '.$category->name)
+            ->icon('heroicon-o-tag')
+            ->body(__('Category restored successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -61,8 +65,9 @@ class CategoryObserver
     public function forceDeleted(Category $category): void
     {
         Notification::make()
-            ->title('Category : '.$category->name)
-            ->body('Category forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('Category') . ' : '.$category->name)
+            ->icon('heroicon-o-tag')
+            ->body(__('Category forceDeleted successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

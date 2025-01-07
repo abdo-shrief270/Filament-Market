@@ -21,7 +21,7 @@ class CityResource extends Resource
 
     protected static ?string $navigationGroup= 'Delivery Management';
 
-    protected static ?int $navigationSort = 3;
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -34,8 +34,8 @@ class CityResource extends Resource
                     ->numeric()
                     ->gte(0)
                     ->required(),
-                Forms\Components\Select::make('zone_id')
-                    ->relationship('zone', 'name')
+                Forms\Components\Select::make('governorate_id')
+                    ->relationship('governorate', 'name')
                     ->required(),
             ]);
     }
@@ -50,7 +50,7 @@ class CityResource extends Resource
                 Tables\Columns\TextColumn::make('shipping_cost')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('zone.name')
+                Tables\Columns\TextColumn::make('governorate.name')
                     ->sortable()
                     ->searchable(),
             ])

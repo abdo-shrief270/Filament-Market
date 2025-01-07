@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ZoneResource\Pages;
-use App\Filament\Resources\ZoneResource\RelationManagers;
-use App\Models\Zone;
+use App\Filament\Resources\GovernorateResource\Pages;
+use App\Filament\Resources\GovernorateResource\RelationManagers;
+use App\Models\Governorate;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -13,15 +13,14 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ZoneResource extends Resource
+class GovernorateResource extends Resource
 {
-    protected static ?string $model = Zone::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-viewfinder-circle';
+    protected static ?string $model = Governorate::class;
+    protected static ?string $navigationIcon = 'heroicon-o-map';
 
     protected static ?string $navigationGroup= 'Delivery Management';
 
-    protected static ?int $navigationSort = 2;
+    protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
     {
@@ -30,8 +29,8 @@ class ZoneResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true),
-                Forms\Components\Select::make('itinerary_id')
-                    ->relationship('itinerary', 'name')
+                Forms\Components\Select::make('country_id')
+                    ->relationship('country', 'name')
                     ->required(),
             ]);
     }
@@ -43,7 +42,7 @@ class ZoneResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('itinerary.name')
+                Tables\Columns\TextColumn::make('country.name')
                     ->sortable()
                     ->searchable(),
             ])
@@ -83,9 +82,7 @@ class ZoneResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListZones::route('/'),
-            'create' => Pages\CreateZone::route('/create'),
-            'edit' => Pages\EditZone::route('/{record}/edit'),
+            'index' => Pages\ListGovernorates::route('/'),
         ];
     }
 }

@@ -12,11 +12,24 @@ class UserObserver
      */
     public function created(User $user): void
     {
-        Notification::make()
-            ->title('User : '.$user->name)
-            ->body('User Created successfully by :'.auth()->user()?->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
+        if($user->type=='admin')
+        {
+            $user->assignRole('super-admin');
+        }elseif ($user->type=='courier')
+        {
+            $user->assignRole('courier');
+        }elseif($user->type=='manager')
+        {
+            $user->assignRole('manager');
+        }
+        if(auth()->user()) {
+            Notification::make()
+                ->title(__('User') . ' : ' . $user->name)
+                ->icon('heroicon-o-user')
+                ->body(__('User Created successfully by') . ' : ' . auth()->user()?->name)
+                ->success()
+                ->sendToDatabase(auth()->user());
+        }
     }
 
     /**
@@ -25,9 +38,10 @@ class UserObserver
     public function updated(User $user): void
     {
         Notification::make()
-            ->title('User : '.$user->name)
-            ->body('User updated successfully by :'.auth()->user()->name)
-            ->success()
+            ->title(__('User') . ' : '.$user->name)
+            ->icon('heroicon-o-user')
+            ->body(__('User updated successfully by').' : '.auth()->user()->name)
+            ->warning()
             ->sendToDatabase(auth()->user());
     }
 
@@ -37,9 +51,10 @@ class UserObserver
     public function deleted(User $user): void
     {
         Notification::make()
-            ->title('User : '.$user->name)
-            ->body('User deleted successfully by :'.auth()->user()->name)
-            ->success()
+            ->title(__('User') . ' : '.$user->name)
+            ->icon('heroicon-o-user')
+            ->body(__('User deleted successfully by').' : '.auth()->user()->name)
+            ->danger()
             ->sendToDatabase(auth()->user());
     }
 
@@ -49,9 +64,10 @@ class UserObserver
     public function restored(User $user): void
     {
         Notification::make()
-            ->title('User : '.$user->name)
-            ->body('User restored successfully by : '.auth()->user()->name)
-            ->success()
+            ->title(__('User') . ' : '.$user->name)
+            ->icon('heroicon-o-user')
+            ->body(__('User restored successfully by').' :  '.auth()->user()->name)
+            ->info()
             ->sendToDatabase(auth()->user());
     }
 
@@ -61,9 +77,10 @@ class UserObserver
     public function forceDeleted(User $user): void
     {
         Notification::make()
-            ->title('User : '.$user->name)
-            ->body('User forceDeleted successfully by :'.auth()->user()->name)
-            ->success()
+            ->title(__('User') . ' : '.$user->name)
+            ->icon('heroicon-o-user')
+            ->body(__('User forceDeleted successfully by').' : '.auth()->user()->name)
+            ->danger()
             ->sendToDatabase(auth()->user());
     }
 }

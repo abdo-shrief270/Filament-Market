@@ -11,20 +11,21 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-#[ObservedBy(UserObserver::class)]
+use Spatie\Permission\Traits\HasRoles;
 
+#[ObservedBy(UserObserver::class)]
 class User extends Authenticatable implements FilamentUser
 {
-    use SoftDeletes,HasFactory, Notifiable;
+    use SoftDeletes,HasFactory, Notifiable,HasRoles;
 
     protected $fillable = [
         'name',
         'email',
         'phone',
+        'password',
         'id_number',
         'type',
-        'itinerary_id',
-        'password',
+        'governorate_id',
         'active'
 
     ];
@@ -33,9 +34,8 @@ class User extends Authenticatable implements FilamentUser
         return $this->active;
     }
 
-
-    public function itinerary():BelongsTo
+    public function governorate():BelongsTo
     {
-        return $this->belongsTo(Itinerary::class);
+        return $this->belongsTo(Governorate::class);
     }
 }

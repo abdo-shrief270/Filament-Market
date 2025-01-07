@@ -17,7 +17,8 @@ class OrderDetailObserver
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
-            ->title('OrderDetail : '.$detail->id)
+            ->title(__('OrderDetail') . ' : '.$detail->id)
+            ->icon('heroicon-o-shopping-bag')
             ->body('OrderDetail Created successfully by :'.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
@@ -31,8 +32,9 @@ class OrderDetailObserver
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
-            ->title('OrderDetail : '.$detail->id)
-            ->body('OrderDetail updated successfully by :'.auth()->user()->name)
+            ->title(__('OrderDetail') . ' : '.$detail->id)
+            ->icon('heroicon-o-shopping-bag')
+            ->body(__('OrderDetail updated successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -48,8 +50,9 @@ class OrderDetailObserver
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
-            ->title('OrderDetail : '.$detail->id)
-            ->body('OrderDetail deleted successfully by :'.auth()->user()->name)
+            ->title(__('OrderDetail') . ' : '.$detail->id)
+            ->icon('heroicon-o-shopping-bag')
+            ->body(__('OrderDetail deleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -66,8 +69,9 @@ class OrderDetailObserver
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
-            ->title('OrderDetail : '.$detail->id)
-            ->body('OrderDetail restored successfully by : '.auth()->user()->name)
+            ->title(__('OrderDetail') . ' : '.$detail->id)
+            ->icon('heroicon-o-shopping-bag')
+            ->body(__('OrderDetail restored successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -80,8 +84,9 @@ class OrderDetailObserver
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
-            ->title('OrderDetail : '.$detail->id)
-            ->body('OrderDetail forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('OrderDetail') . ' : '.$detail->id)
+            ->icon('heroicon-o-shopping-bag')
+            ->body(__('OrderDetail forceDeleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

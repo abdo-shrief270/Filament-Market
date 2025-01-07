@@ -12,9 +12,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class City extends Model
 {
     use SoftDeletes;
-    protected $fillable =['name','zone_id','shipping_cost'];
-    public function zone():BelongsTo
+    protected $fillable =['name','governorate_id','shipping_cost'];
+    public function governorate():BelongsTo
     {
-        return $this->belongsTo(Zone::class);
+        return $this->belongsTo(Governorate::class);
     }
 }

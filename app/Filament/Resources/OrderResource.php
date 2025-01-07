@@ -4,13 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
+use App\Filament\Resources\OrderResource\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
 use App\Models\Order;
+use App\Models\OrderNote;
 use App\Models\Product;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -43,7 +45,6 @@ class OrderResource extends Resource
                             ]),
                     ])
                     ->columnSpan(['lg' => fn (?Order $record) => $record === null ? 3 : 2]),
-
                 Forms\Components\Section::make()
                     ->schema([
                         Forms\Components\Placeholder::make('created_at')
@@ -59,17 +60,24 @@ class OrderResource extends Resource
             ])
             ->columns(3);
     }
-
+    public static function getRelations(): array
+    {
+        return [
+            NotesRelationManager::class,
+        ];
+    }
     public static function table(Table $table): Table
     {
         return $table
             ->columns([
+
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Customer Name')
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer.phone')
                     ->label('Customer Phone')
+                    ->icon('heroicon-m-phone')
                     ->sortable()
                     ->copyable()
                     ->searchable(),
@@ -79,10 +87,12 @@ class OrderResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('courier.phone')
                     ->label('Delivery Phone')
+                    ->icon('heroicon-m-phone')
                     ->copyable()
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('discount_type')
+                    ->alignCenter()
                     ->label('Discount Type')
                     ->formatStateUsing(fn (string $state): string => $state === 'amount' ? 'EGP' : '%')
                     ->sortable()
@@ -96,6 +106,18 @@ class OrderResource extends Resource
                     ->formatStateUsing(fn ($record): string => $record->discount_display === 'EGP'
                         ? number_format($record->discount, 2) . ' EGP'
                         : number_format($record->discount, 2) . ' %')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('order_price')
+                    ->label('Order Price')
+                    ->sortable()
+                    ->color('info')
+                    ->money('egp')
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('customer.city.shipping_cost')
+                    ->label('Shipping Price')
+                    ->sortable()
+                    ->color('danger')
+                    ->money('egp')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('Total Price')
@@ -115,6 +137,7 @@ class OrderResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
                 Tables\Actions\RestoreAction::make()
@@ -146,12 +169,6 @@ class OrderResource extends Resource
     {
         return static::getModel()::count() > 10 ? 'warning' : 'primary';
     }
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
 
     public static function getPages(): array
     {
@@ -159,6 +176,7 @@ class OrderResource extends Resource
             'index' => Pages\ListOrders::route('/'),
             'create' => Pages\CreateOrder::route('/create'),
             'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'view' => Pages\ViewOrder::route('/{record}'),
         ];
     }
 
@@ -302,9 +320,6 @@ class OrderResource extends Resource
                 ->inline()
                 ->options(OrderStatus::class)
                 ->required(),
-
-            Forms\Components\MarkdownEditor::make('notes')
-                ->columnSpan('full'),
         ];
     }
 }

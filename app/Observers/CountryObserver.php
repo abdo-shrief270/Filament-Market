@@ -13,8 +13,9 @@ class CountryObserver
     public function created(Country $country): void
     {
         Notification::make()
-            ->title('Country : '.$country->name)
-            ->body('Country Created successfully by :'.auth()->user()->name)
+            ->title(__('Country') . ' : '.$country->name)
+            ->icon('heroicon-o-flag')
+            ->body(__('Country Created successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -25,8 +26,9 @@ class CountryObserver
     public function updated(Country $country): void
     {
         Notification::make()
-            ->title('Country : '.$country->name)
-            ->body('Country updated successfully by :'.auth()->user()->name)
+            ->title(__('Country') . ' : '.$country->name)
+            ->icon('heroicon-o-flag')
+            ->body(__('Country updated successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -37,8 +39,9 @@ class CountryObserver
     public function deleted(Country $country): void
     {
         Notification::make()
-            ->title('Country : '.$country->name)
-            ->body('Country deleted successfully by :'.auth()->user()->name)
+            ->title(__('Country') . ' : '.$country->name)
+            ->icon('heroicon-o-flag')
+            ->body(__('Country deleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -49,8 +52,9 @@ class CountryObserver
     public function restored(Country $country): void
     {
         Notification::make()
-            ->title('Country : '.$country->name)
-            ->body('Country restored successfully by : '.auth()->user()->name)
+            ->title(__('Country') . ' : '.$country->name)
+            ->icon('heroicon-o-flag')
+            ->body(__('Country restored successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
@@ -61,8 +65,9 @@ class CountryObserver
     public function forceDeleted(Country $country): void
     {
         Notification::make()
-            ->title('Country : '.$country->name)
-            ->body('Country forceDeleted successfully by :'.auth()->user()->name)
+            ->title(__('Country') . ' : '.$country->name)
+            ->icon('heroicon-o-flag')
+            ->body(__('Country forceDeleted successfully by').' : '.auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }
