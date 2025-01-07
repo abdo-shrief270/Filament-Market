@@ -118,6 +118,14 @@ return new class extends Migration
         app('cache')
             ->store(config('permission.cache.store') != 'default' ? config('permission.cache.store') : null)
             ->forget(config('permission.cache.key'));
+        \App\Models\User::create([
+            'name'=>'Abdo Shrief',
+            'phone'=>'01270989676',
+            'email'=>'abdo.shrief270@gmail.com',
+            'type'=>'admin',
+            'password'=>\Illuminate\Support\Facades\Hash::make('12345678'),
+            'active'=>true
+        ]);
     }
 
     /**
