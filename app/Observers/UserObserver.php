@@ -21,6 +21,9 @@ class UserObserver
         }elseif($user->type=='manager')
         {
             $user->assignRole('manager');
+        }elseif($user->type=='sales')
+        {
+            $user->assignRole('sales');
         }
         if(auth()->user()) {
             Notification::make()
@@ -54,32 +57,6 @@ class UserObserver
             ->title(__('User') . ' : '.$user->name)
             ->icon('heroicon-o-user')
             ->body(__('User deleted successfully by').' : '.auth()->user()->name)
-            ->danger()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the User "restored" event.
-     */
-    public function restored(User $user): void
-    {
-        Notification::make()
-            ->title(__('User') . ' : '.$user->name)
-            ->icon('heroicon-o-user')
-            ->body(__('User restored successfully by').' :  '.auth()->user()->name)
-            ->info()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the User "force deleted" event.
-     */
-    public function forceDeleted(User $user): void
-    {
-        Notification::make()
-            ->title(__('User') . ' : '.$user->name)
-            ->icon('heroicon-o-user')
-            ->body(__('User forceDeleted successfully by').' : '.auth()->user()->name)
             ->danger()
             ->sendToDatabase(auth()->user());
     }

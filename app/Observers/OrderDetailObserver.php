@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Events\OrderUpdated;
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Filament\Notifications\Notification;
 
 class OrderDetailObserver
@@ -14,14 +15,26 @@ class OrderDetailObserver
      */
     public function created(OrderDetail $detail): void
     {
-        $order = Order::find($detail->order_id);
-        OrderUpdated::dispatch($order);
-        Notification::make()
-            ->title(__('OrderDetail') . ' : '.$detail->id)
-            ->icon('heroicon-o-shopping-bag')
-            ->body('OrderDetail Created successfully by :'.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
+//        $product = Product::find($detail->product_id);
+//
+//        if (!$product || $product->quantity < $detail->quantity) {
+//            throw new \Exception("Not enough stock available.");
+//        }
+//
+//        // Reduce stock
+//        $product->decrement('quantity', $detail->quantity);
+
+
+        if(auth()->user()) {
+            $order = Order::find($detail->order_id);
+            OrderUpdated::dispatch($order);
+            Notification::make()
+                ->title(__('OrderDetail') . ' : ' . $detail->id)
+                ->icon('heroicon-o-shopping-bag')
+                ->body('OrderDetail Created successfully by :' . auth()->user()->name)
+                ->success()
+                ->sendToDatabase(auth()->user());
+        }
     }
 
     /**
@@ -29,6 +42,23 @@ class OrderDetailObserver
      */
     public function updated(OrderDetail $detail): void
     {
+//        $product = Product::find($detail->product_id);
+//        $originalQuantity = $detail->getOriginal('quantity'); // Previous quantity
+//        $newQuantity = $detail->quantity; // New quantity
+//
+//        if (!$product) {
+//            throw new \Exception("Product not found.");
+//        }
+//
+//        $stockAdjustment = $newQuantity - $originalQuantity; // Difference
+//
+//        if ($stockAdjustment > 0 && $product->quantity < $stockAdjustment) {
+//            throw new \Exception("Not enough stock available.");
+//        }
+//
+//        // Adjust stock based on the update
+//        $product->decrement('quantity', $stockAdjustment);
+
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
@@ -44,9 +74,10 @@ class OrderDetailObserver
      */
     public function deleted(OrderDetail $detail): void
     {
-        $detail->update([
-            'last_order_id' => $detail->last_order
-        ]);
+//        $product = Product::find($detail->product_id);
+//        if ($product) {
+//            $product->increment('quantity', $detail->quantity);
+//        }
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);
         Notification::make()
@@ -57,37 +88,4 @@ class OrderDetailObserver
             ->sendToDatabase(auth()->user());
     }
 
-    /**
-     * Handle the OrderDetail "restored" event.
-     */
-    public function restored(OrderDetail $detail): void
-    {
-        $detail->update([
-            'last_order_id' =>null,
-            'order_id' => $detail->last_order_id
-        ]);
-        $order = Order::find($detail->order_id);
-        OrderUpdated::dispatch($order);
-        Notification::make()
-            ->title(__('OrderDetail') . ' : '.$detail->id)
-            ->icon('heroicon-o-shopping-bag')
-            ->body(__('OrderDetail restored successfully by').' : '.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the OrderDetail "force deleted" event.
-     */
-    public function forceDeleted(OrderDetail $detail): void
-    {
-        $order = Order::find($detail->order_id);
-        OrderUpdated::dispatch($order);
-        Notification::make()
-            ->title(__('OrderDetail') . ' : '.$detail->id)
-            ->icon('heroicon-o-shopping-bag')
-            ->body(__('OrderDetail forceDeleted successfully by').' : '.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
 }

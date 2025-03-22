@@ -11,11 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('countries', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->softDeletes();
-            $table->timestamps();
+        Schema::table('cities', function (Blueprint $table) {
+            $table->foreignId('delivery_man_id')->nullable()->after('governorate_id')->constrained('users','id')->cascadeOnDelete();
         });
     }
 
@@ -24,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('countries');
+        Schema::table('cities', function (Blueprint $table) {
+            $table->dropColumn('delivery_man_id');
+        });
     }
 };

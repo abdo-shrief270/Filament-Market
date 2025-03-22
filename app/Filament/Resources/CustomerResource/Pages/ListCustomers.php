@@ -17,11 +17,4 @@ class ListCustomers extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
-    public function getTabs(): array
-    {
-        return [
-            null => Tab::make('All')->query(fn ($query) => $query->where('deleted_at',null)),
-            'archived' => Tab::make()->query(fn ($query) => $query->where('deleted_at','!=',null)),
-        ];
-    }
 }

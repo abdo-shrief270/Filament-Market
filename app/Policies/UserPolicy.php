@@ -18,7 +18,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_manager');
+        return $user->can('view_any_delivery::man');
     }
 
     /**
@@ -29,7 +29,7 @@ class UserPolicy
      */
     public function view(User $user): bool
     {
-        return $user->can('view_manager');
+        return $user->can('view_delivery::man');
     }
 
     /**
@@ -40,7 +40,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_manager');
+        return $user->can('create_delivery::man');
     }
 
     /**
@@ -51,7 +51,7 @@ class UserPolicy
      */
     public function update(User $user): bool
     {
-        return $user->can('update_manager');
+        return $user->can('update_delivery::man');
     }
 
     /**
@@ -62,7 +62,7 @@ class UserPolicy
      */
     public function delete(User $user): bool
     {
-        return $user->can('delete_manager');
+        return $user->can('delete_delivery::man');
     }
 
     /**
@@ -73,7 +73,7 @@ class UserPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_manager');
+        return $user->can('delete_any_delivery::man');
     }
 
     /**
@@ -84,7 +84,7 @@ class UserPolicy
      */
     public function forceDelete(User $user): bool
     {
-        return $user->can('force_delete_manager');
+        return $user->can('{{ ForceDelete }}');
     }
 
     /**
@@ -95,7 +95,7 @@ class UserPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_manager');
+        return $user->can('{{ ForceDeleteAny }}');
     }
 
     /**
@@ -106,7 +106,7 @@ class UserPolicy
      */
     public function restore(User $user): bool
     {
-        return $user->can('restore_manager');
+        return $user->can('{{ Restore }}');
     }
 
     /**
@@ -117,7 +117,7 @@ class UserPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_manager');
+        return $user->can('{{ RestoreAny }}');
     }
 
     /**
@@ -128,7 +128,7 @@ class UserPolicy
      */
     public function replicate(User $user): bool
     {
-        return $user->can('replicate_manager');
+        return $user->can('{{ Replicate }}');
     }
 
     /**
@@ -139,6 +139,6 @@ class UserPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_manager');
+        return $user->can('{{ Reorder }}');
     }
 }

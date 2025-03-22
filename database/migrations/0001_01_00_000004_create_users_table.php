@@ -16,14 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique()->nullable();
             $table->string('phone')->unique()->nullable();
-            $table->enum('type',['user','admin','manager','courier'])->default('user');
-            $table->string('id_number')->unique()->nullable();
-            $table->timestamp('email_verified_at')->nullable();
+            $table->enum('type',['user','admin','manager','courier','sales'])->default('user');
             $table->foreignId('governorate_id')->nullable()->constrained()->nullOnDelete();
             $table->string('password');
             $table->boolean('active')->default(false);
             $table->rememberToken();
-            $table->softDeletes();
+//            $table->softDeletes();
             $table->timestamps();
         });
     }

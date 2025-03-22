@@ -67,12 +67,12 @@ class CreateOrder extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        if($data['discount_type']=='amount')
-        {
-            $data['discount'] = $data['discount_amount'];
-        }else{
-            $data['discount'] = $data['discount_per'];
-        }
+//        if($data['discount_type']=='amount')
+//        {
+//            $data['discount'] = $data['discount_amount'];
+//        }else{
+//            $data['discount'] = $data['discount_per'];
+//        }
         return $data;
     }
     protected function getRedirectUrl(): string

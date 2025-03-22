@@ -11,7 +11,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class CustomerResource extends Resource
 {
@@ -56,12 +55,13 @@ class CustomerResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
-                    ->sortable()
-                    ->copyable()
+                    ->label('Customer Phone')
+                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
+                    ->alignCenter()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->sortable()
-                    ->copyable()
+                    ->url(fn ($state) =>'mailto:'.$state)
                     ->searchable(),
                 Tables\Columns\TextColumn::make('buy_count')
                     ->sortable(),
@@ -69,6 +69,8 @@ class CustomerResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('address')
+//                    ->wrap()
+                    ->limit(50)
                     ->sortable()
                     ->searchable(),
             ])
@@ -77,12 +79,10 @@ class CustomerResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make()
-                    ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
-                Tables\Actions\DeleteAction::make()
-                    ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
-                Tables\Actions\RestoreAction::make()
-                    ->visible(fn ($livewire) => $livewire->activeTab === 'archived'),
+                Tables\Actions\ViewAction::make(),
+
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -94,7 +94,7 @@ class CustomerResource extends Resource
     }
     public static function getEloquentQuery(): Builder
     {
-        return parent::getEloquentQuery()->withoutGlobalScope(SoftDeletingScope::class);
+        return parent::getEloquentQuery();
     }
     public static function getNavigationBadge(): ?string
     {

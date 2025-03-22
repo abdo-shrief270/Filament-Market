@@ -12,8 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    use SoftDeletes;
-    protected $fillable =['name','phone','email','buy_count','city_id','last_city_id','address'];
+    protected $fillable =['name','phone','email','buy_count','city_id','address'];
 
     public function city():BelongsTo
     {

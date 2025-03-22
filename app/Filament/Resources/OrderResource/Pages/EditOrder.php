@@ -13,22 +13,22 @@ class EditOrder extends EditRecord
 
     protected function mutateFormDataBeforeFill(array $data): array
     {
-        if($data['discount_type']=='amount')
-        {
-            $data['discount_amount'] = $data['discount'];
-        }else{
-            $data['discount_per'] = $data['discount'];
-        }
+//        if($data['discount_type']=='amount')
+//        {
+//            $data['discount_amount'] = $data['discount'];
+//        }else{
+//            $data['discount_per'] = $data['discount'];
+//        }
         return $data;
     }
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if($data['discount_type']=='amount')
-        {
-            $data['discount'] = $data['discount_amount'];
-        }else{
-            $data['discount'] = $data['discount_per'];
-        }
+//        if($data['discount_type']=='amount')
+//        {
+//            $data['discount'] = $data['discount_amount'];
+//        }else{
+//            $data['discount'] = $data['discount_per'];
+//        }
         return $data;
     }
     protected function getHeaderActions(): array

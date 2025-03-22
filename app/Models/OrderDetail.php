@@ -11,8 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(OrderDetailObserver::class)]
 class OrderDetail extends Model
 {
-    use SoftDeletes;
-    protected $fillable =['order_id','last_order_id','product_id','quantity'];
+    protected $fillable =['order_id','product_id','quantity'];
 
     public function order():BelongsTo
     {

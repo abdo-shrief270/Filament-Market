@@ -63,7 +63,7 @@ class ManagerPolicy
      */
     public function forceDelete(User $user, Manager $manager): bool
     {
-        return $user->can('force_delete_manager');
+        return $user->can('{{ ForceDelete }}');
     }
 
     /**
@@ -71,7 +71,7 @@ class ManagerPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_manager');
+        return $user->can('{{ ForceDeleteAny }}');
     }
 
     /**
@@ -79,7 +79,7 @@ class ManagerPolicy
      */
     public function restore(User $user, Manager $manager): bool
     {
-        return $user->can('restore_manager');
+        return $user->can('{{ Restore }}');
     }
 
     /**
@@ -87,7 +87,7 @@ class ManagerPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_manager');
+        return $user->can('{{ RestoreAny }}');
     }
 
     /**
@@ -95,7 +95,7 @@ class ManagerPolicy
      */
     public function replicate(User $user, Manager $manager): bool
     {
-        return $user->can('replicate_manager');
+        return $user->can('{{ Replicate }}');
     }
 
     /**
@@ -103,6 +103,6 @@ class ManagerPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_manager');
+        return $user->can('{{ Reorder }}');
     }
 }

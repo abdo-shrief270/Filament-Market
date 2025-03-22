@@ -22,8 +22,7 @@ return new class extends Migration
             $table->decimal('price', 10,2);
             $table->integer('quantity');
             $table->foreignId('store_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->softDeletes();
+//            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -12,12 +12,14 @@ class CustomerObserver
      */
     public function created(Customer $customer): void
     {
-        Notification::make()
-            ->title(__('Customer') . ' : '.$customer->name)
-            ->icon('heroicon-o-user-group')
-            ->body(__('Customer Created successfully by').' : '.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
+        if(auth()->user()) {
+            Notification::make()
+                ->title(__('Customer') . ' : ' . $customer->name)
+                ->icon('heroicon-o-user-group')
+                ->body(__('Customer Created successfully by') . ' : ' . auth()->user()?->name)
+                ->success()
+                ->sendToDatabase(auth()->user());
+        }
     }
 
     /**
@@ -46,29 +48,4 @@ class CustomerObserver
             ->sendToDatabase(auth()->user());
     }
 
-    /**
-     * Handle the Customer "restored" event.
-     */
-    public function restored(Customer $customer): void
-    {
-        Notification::make()
-            ->title(__('Customer') . ' : '.$customer->name)
-            ->icon('heroicon-o-user-group')
-            ->body(__('Customer restored successfully by').' : '.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the Customer "force deleted" event.
-     */
-    public function forceDeleted(Customer $customer): void
-    {
-        Notification::make()
-            ->title(__('Customer') . ' : '.$customer->name)
-            ->icon('heroicon-o-user-group')
-            ->body(__('Customer forceDeleted successfully by').' : '.auth()->user()->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
 }

@@ -63,7 +63,7 @@ class GovernoratePolicy
      */
     public function forceDelete(User $user, Governorate $governorate): bool
     {
-        return $user->can('force_delete_governorate');
+        return $user->can('{{ ForceDelete }}');
     }
 
     /**
@@ -71,7 +71,7 @@ class GovernoratePolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_governorate');
+        return $user->can('{{ ForceDeleteAny }}');
     }
 
     /**
@@ -79,7 +79,7 @@ class GovernoratePolicy
      */
     public function restore(User $user, Governorate $governorate): bool
     {
-        return $user->can('restore_governorate');
+        return $user->can('{{ Restore }}');
     }
 
     /**
@@ -87,7 +87,7 @@ class GovernoratePolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_governorate');
+        return $user->can('{{ RestoreAny }}');
     }
 
     /**
@@ -95,7 +95,7 @@ class GovernoratePolicy
      */
     public function replicate(User $user, Governorate $governorate): bool
     {
-        return $user->can('replicate_governorate');
+        return $user->can('{{ Replicate }}');
     }
 
     /**
@@ -103,6 +103,6 @@ class GovernoratePolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_governorate');
+        return $user->can('{{ Reorder }}');
     }
 }

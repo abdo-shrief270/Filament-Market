@@ -29,9 +29,6 @@ class ProductResource extends Resource
                 Forms\Components\Select::make('store_id')
                     ->relationship('store', 'name')
                     ->required(),
-                Forms\Components\Select::make('category_id')
-                    ->relationship('category', 'name')
-                    ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true),
@@ -93,13 +90,23 @@ class ProductResource extends Resource
                 Tables\Columns\TextColumn::make('quantity')
                     ->sortable()
                     ->searchable(),
+                Tables\Columns\TextColumn::make('logs_count')
+                    ->counts('logs')
+                    ->label('Total Movements')
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('in_logs_count')
+                    ->label('Stock In')
+                    ->getStateUsing(fn($record) => $record->logs()->where('type', 'in')->sum('quantity'))
+                    ->sortable(),
+
+                Tables\Columns\TextColumn::make('out_logs_count')
+                    ->label('Stock Out')
+                    ->getStateUsing(fn($record) => $record->logs()->where('type', 'out')->sum('quantity'))
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('store.name')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('category.name')
-                    ->sortable()
-                    ->searchable(),
-
             ])
             ->defaultSort('updated_at','desc')
             ->filters([
@@ -109,6 +116,28 @@ class ProductResource extends Resource
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make(),
+                Tables\Actions\Action::make('adjust_stock')
+                    ->icon('heroicon-o-cog')
+                    ->label('Adjust Stock')
+                    ->form([
+                        Forms\Components\Select::make('type')
+                            ->options(['in' => 'In', 'out' => 'Out'])
+                            ->required(),
+                        Forms\Components\TextInput::make('quantity')
+                            ->numeric()
+                            ->rule('gte:1')
+                            ->required(),
+                        Forms\Components\TextInput::make('source')
+                            ->required(),
+                    ])
+                    ->action(function (array $data, Product $record) {
+                        if ($data['type'] === 'in') {
+                            $record->increaseStock($data['quantity'], $data['source'], auth()->id());
+                        } else {
+                            $record->decreaseStock($data['quantity'], $data['source'], auth()->id());
+                        }
+                    })
+                    ->modalHeading('Adjust Stock'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -131,7 +160,7 @@ class ProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ProductResource\RelationManagers\ProductLogsRelationManager::make(),
         ];
     }
 

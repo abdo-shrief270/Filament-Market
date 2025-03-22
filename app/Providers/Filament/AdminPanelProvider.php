@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Auth\CustomLogin;
+use Filament\Enums\ThemeMode;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -19,6 +20,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Psy\Output\Theme;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -30,8 +32,17 @@ class AdminPanelProvider extends PanelProvider
             ->path('/')
             ->login(CustomLogin::class)
             ->profile()
+//            ->colors([
+//                'primary' => Color::Amber,
+//            ])
             ->colors([
+                'danger' => Color::Rose,
+                'gray' => Color::Gray,
+                'info' => Color::Blue,
+//                'primary' => Color::Indigo,
                 'primary' => Color::Amber,
+                'success' => Color::Emerald,
+                'warning' => Color::Orange,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -59,9 +70,18 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ])->maxContentWidth(MaxWidth::Full)
+            ])
+            ->navigationGroups([
+                'Filament Shield',
+                'Delivery Management',
+                'Orders Management',
+                'Products Management',
+            ])
+            ->maxContentWidth(MaxWidth::Full)
             ->sidebarFullyCollapsibleOnDesktop()
             ->spa()
+            ->defaultThemeMode(ThemeMode::System)
+            ->darkMode()
             ->databaseNotifications()
             ->databaseNotificationsPolling('0.5s');
     }

@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_details', function (Blueprint $table) {
+        Schema::create('product_logs', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('product_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('product_id')->constrained()->onDelete('cascade');
+            $table->enum('type', ['in', 'out']);
             $table->integer('quantity');
-//            $table->softDeletes();
+            $table->string('source');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('set null'); // Who performed the action
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_details');
+        Schema::dropIfExists('product_logs');
     }
 };

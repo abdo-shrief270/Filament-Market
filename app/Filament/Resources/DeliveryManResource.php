@@ -39,11 +39,6 @@ class DeliveryManResource extends Resource
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('password')
                     ->minLength(8),
-                Forms\Components\TextInput::make('id_number')
-                    ->required()
-                    ->alphaNum()
-                    ->length(14)
-                    ->unique(ignoreRecord: true),
                 Forms\Components\Select::make('governorate_id')
                     ->relationship('governorate', 'name')
                     ->required(),
@@ -63,10 +58,6 @@ class DeliveryManResource extends Resource
                     ->copyable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->sortable()
-                    ->copyable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('id_number')
                     ->sortable()
                     ->copyable()
                     ->searchable(),

@@ -37,6 +37,8 @@ class CityResource extends Resource
                 Forms\Components\Select::make('governorate_id')
                     ->relationship('governorate', 'name')
                     ->required(),
+                Forms\Components\Select::make('delivery_man_id')
+                    ->relationship('delivery_man', 'name'),
             ]);
     }
 
@@ -51,6 +53,9 @@ class CityResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('governorate.name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('delivery_man.name')
                     ->sortable()
                     ->searchable(),
             ])

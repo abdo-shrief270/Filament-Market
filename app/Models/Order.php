@@ -11,8 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(OrderObserver::class)]
 class Order extends Model
 {
-    use SoftDeletes;
-    protected $fillable = ['customer_id','last_customer_id','courier_id','last_courier_id','order_status','discount_type','discount','number','total_price'];
+    protected $fillable = ['customer_id','location_link','courier_id','order_status','discount_type','discount','number','total_price'];
 
     public function customer():BelongsTo
     {
@@ -51,5 +50,22 @@ class Order extends Model
     public function notes(): HasMany
     {
         return $this->hasMany(OrderNote::class, 'order_id');
+    }
+
+    public function markAsCancelled()
+    {
+        foreach($this->details as $detail) {
+            $detail->product->addStock($detail->quantity, 'cancellation', auth()->id());
+        }
+
+        $this->update(['status' => 'cancelled']);
+    }
+    public function markAsCompleted()
+    {
+        foreach ($this->details as $detail) {
+            $detail->product->removeStock($detail->quantity, 'order', auth()->id());
+        }
+
+        $this->update(['status' => 'completed']);
     }
 }

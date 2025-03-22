@@ -6,18 +6,23 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
+use App\Models\Customer;
 use App\Models\Order;
+use App\Models\OrderDetail;
 use App\Models\OrderNote;
 use App\Models\Product;
+use App\Models\User;
 use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
 
 class OrderResource extends Resource
 {
@@ -74,59 +79,77 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('customer.name')
                     ->label('Customer Name')
                     ->sortable()
+                    ->alignCenter()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer.phone')
                     ->label('Customer Phone')
-                    ->icon('heroicon-m-phone')
-                    ->sortable()
-                    ->copyable()
+                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
+                    ->alignCenter()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('location_link')
+                    ->label('Location Link')
+                    ->icon('heroicon-o-link')
+                    ->formatStateUsing(fn ($state) => $state ? 'Link': 'No Link')
+                    ->url(fn ($state) => filter_var($state, FILTER_VALIDATE_URL) ? $state : Null)
+                    ->openUrlInNewTab()
+                    ->alignCenter()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('courier.name')
                     ->label('Delivery Name')
                     ->sortable()
+                    ->hidden(auth()->user()->hasRole('courier'))
+                    ->alignCenter()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('courier.phone')
                     ->label('Delivery Phone')
-                    ->icon('heroicon-m-phone')
-                    ->copyable()
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('discount_type')
+                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
+                    ->hidden(auth()->user()->hasRole('courier'))
                     ->alignCenter()
-                    ->label('Discount Type')
-                    ->formatStateUsing(fn (string $state): string => $state === 'amount' ? 'EGP' : '%')
-                    ->sortable()
-                    ->color(fn (string $state): string => $state === 'amount' ? 'info' : 'danger')
                     ->searchable(),
-
-                Tables\Columns\TextColumn::make('discount')
-                    ->label('Discount')
-                    ->color(fn ($record): string => $record->discount_color)
-                    ->sortable()
-                    ->formatStateUsing(fn ($record): string => $record->discount_display === 'EGP'
-                        ? number_format($record->discount, 2) . ' EGP'
-                        : number_format($record->discount, 2) . ' %')
-                    ->searchable(),
+//                Tables\Columns\TextColumn::make('discount_type')
+//                    ->alignCenter()
+//                    ->label('Discount Type')
+//                    ->formatStateUsing(fn (string $state): string => $state === 'amount' ? 'EGP' : '%')
+//                    ->sortable()
+//                    ->color(fn (string $state): string => $state === 'amount' ? 'info' : 'danger')
+//                    ->searchable(),
+//
+//                Tables\Columns\TextColumn::make('discount')
+//                    ->label('Discount')
+//                    ->alignCenter()
+//                    ->color(fn ($record): string => $record->discount_color)
+//                    ->sortable()
+//                    ->formatStateUsing(fn ($record): string => $record->discount_display === 'EGP'
+//                        ? number_format($record->discount, 2) . ' EGP'
+//                        : number_format($record->discount, 2) . ' %')
+//                    ->searchable(),
                 Tables\Columns\TextColumn::make('order_price')
                     ->label('Order Price')
                     ->sortable()
+                    ->hidden(auth()->user()->hasRole('courier'))
+                    ->alignCenter()
+                    ->alignCenter()
                     ->color('info')
                     ->money('egp')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('customer.city.shipping_cost')
                     ->label('Shipping Price')
                     ->sortable()
+                    ->hidden(auth()->user()->hasRole('courier'))
+                    ->alignCenter()
                     ->color('danger')
                     ->money('egp')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('total_price')
                     ->label('Total Price')
                     ->sortable()
+                    ->alignCenter()
                     ->color('success')
                     ->money('egp')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order_status')
                     ->badge()
+                    ->alignCenter()
                     ->label('Order Status')
                     ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getlabel() : '-')
                     ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
@@ -137,11 +160,33 @@ class OrderResource extends Resource
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('Done')
+                    ->label('Mark as Delivered') // Set button label
+                    ->icon('heroicon-o-check') // Optional: Add an icon
+                    ->color('success') // Green color
+                    ->hidden(fn () => !auth()->user()->hasRole('courier')) // Show only for couriers
+                    ->action(function (Order $record) {
+                        $record->update(['order_status' => 'delivered']); // Update order status
+                        Notification::make()
+                            ->title('Order Delivered')
+                            ->success()
+                            ->body('The order has been marked as delivered.')
+                            ->send();
+                    }),
                 Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()
-                    ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
-                Tables\Actions\RestoreAction::make()
-                    ->visible(fn ($livewire) => $livewire->activeTab === 'archived'),
+                Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                ->before(function(Order $record){
+                    foreach($record->details as $detail){
+                        $product = Product::find($detail->product_id);
+                        if ($product) {
+                            $product->increment('quantity', $detail->quantity);
+                        }
+                    }
+                }),
+//                    ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
+//                Tables\Actions\RestoreAction::make()
+//                    ->visible(fn ($livewire) => $livewire->activeTab === 'archived'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -153,9 +198,12 @@ class OrderResource extends Resource
     }
     public static function getWidgets(): array
     {
-        return [
-            OrderStats::class,
-        ];
+        if (Auth::check() && !Auth::user()->hasRole('courier')) {
+            return [
+                OrderStats::class,
+            ];
+        }
+        return [];
     }
     public static function getEloquentQuery(): Builder
     {
@@ -205,6 +253,13 @@ class OrderResource extends Resource
                     ->columnSpan([
                         'md' => 2,
                     ])
+                    ->maxValue(function (Forms\Get $get, $state) {
+                        $product = Product::find($get('product_id'));
+                        $existingOrder = $get('id') ? OrderDetail::find($get('id')) : null; // Check if editing
+
+                        $previousQuantity = $existingOrder?->quantity ?? 0; // Get previous quantity in the order
+                        return ($product?->quantity ?? 0) + $previousQuantity; // Allow reallocation in edit mode
+                    })// Ensures user doesn't exceed available stock
                     ->required(),
 
                 Forms\Components\TextInput::make('price')
@@ -238,8 +293,7 @@ class OrderResource extends Resource
             ->hiddenLabel()
             ->columns([
                 'md' => 10,
-            ])
-            ->required();
+            ]);
     }
     public static function getDetailsFormSchema(): array
     {
@@ -256,6 +310,10 @@ class OrderResource extends Resource
                 ->relationship('customer', 'name')
                 ->searchable()
                 ->required()
+                ->reactive()
+                ->afterStateUpdated(fn ($state, callable $set) =>
+                    $set('courier_id', Customer::find($state)?->city?->delivery_man_id)
+                )
                 ->createOptionForm([
                     Forms\Components\TextInput::make('name')
                         ->required()
@@ -292,34 +350,40 @@ class OrderResource extends Resource
             Forms\Components\Select::make('courier_id')
                 ->label('Delivery Man')
                 ->relationship('courier', 'name')
+                ->live()
                 ->required(),
-            Forms\Components\Select::make('discount_type')
-                ->options([
-                    'percentage' => '%',
-                    'amount' => 'amount'
-                ])->default('amount')
-                ->live(),
-            Forms\Components\TextInput::make('discount_amount')
-                ->label('Discount Amount in EGP')
-                ->numeric()
-                ->disabled(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
-                ->hidden(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
-                ->required(fn (Forms\Get $get) => $get('discount_type') == 'amount')
-                ->rules('gte:0')
-                ->live(),
-
-            Forms\Components\TextInput::make('discount_per')
-                ->label('Discount Percentage 0 => 100')
-                ->numeric()
-                ->disabled(fn (Forms\Get $get) => $get('discount_type') == 'amount')
-                ->hidden(fn (Forms\Get $get) => $get('discount_type') == 'amount')
-                ->required(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
-                ->rules('gte:0|lte:100')
-                ->live(),
+            Forms\Components\TextInput::make('location_link')
+                ->label('Location Link')
+                ->activeUrl(),
+//            Forms\Components\Select::make('discount_type')
+//                ->options([
+//                    'percentage' => '%',
+//                    'amount' => 'amount'
+//                ])->default('amount')
+//                ->live(),
+//            Forms\Components\TextInput::make('discount_amount')
+//                ->label('Discount Amount in EGP')
+//                ->numeric()
+//                ->disabled(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
+//                ->hidden(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
+//                ->required(fn (Forms\Get $get) => $get('discount_type') == 'amount')
+//                ->rules('gte:0')
+//                ->live(),
+//
+//            Forms\Components\TextInput::make('discount_per')
+//                ->label('Discount Percentage 0 => 100')
+//                ->numeric()
+//                ->disabled(fn (Forms\Get $get) => $get('discount_type') == 'amount')
+//                ->hidden(fn (Forms\Get $get) => $get('discount_type') == 'amount')
+//                ->required(fn (Forms\Get $get) => $get('discount_type') !== 'amount')
+//                ->rules('gte:0|lte:100')
+//                ->live(),
 
             Forms\Components\ToggleButtons::make('order_status')
                 ->inline()
                 ->options(OrderStatus::class)
+                ->default(OrderStatus::New)
+                ->columnSpan(2)
                 ->required(),
         ];
     }

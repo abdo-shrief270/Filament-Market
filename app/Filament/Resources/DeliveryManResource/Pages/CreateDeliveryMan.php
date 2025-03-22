@@ -16,7 +16,7 @@ class CreateDeliveryMan extends CreateRecord
         $data['type'] = 'courier';
         if(!isset($data['password']))
         {
-            $data['password'] = Hash::make($data['id_number']);
+            $data['password'] = Hash::make('12345678');
         }else{
             $data['password'] = Hash::make($data['password']);
         }

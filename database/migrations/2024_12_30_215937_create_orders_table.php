@@ -15,14 +15,13 @@ return new class extends Migration
             $table->id();
             $table->string('number');
             $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
-            $table->bigInteger('last_customer_id')->nullable();
             $table->decimal('total_price')->default(0);
             $table->enum('discount_type',['percentage','amount']);
             $table->decimal('discount')->nullable();
             $table->foreignId('courier_id')->nullable()->constrained('users','id')->nullOnDelete();
-            $table->bigInteger('last_courier_id')->nullable();
+            $table->text('location_link')->nullable();
             $table->enum('order_status',['new','processing','shipped','delivered','cancelled']);
-            $table->softDeletes();
+//            $table->softDeletes();
             $table->timestamps();
         });
     }

@@ -11,10 +11,5 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(GovernorateObserver::class)]
 class Governorate extends Model
 {
-    use SoftDeletes;
-    protected $fillable =['name','country_id'];
-    public function country():BelongsTo
-    {
-        return $this->belongsTo(Country::class);
-    }
+    protected $fillable =['name'];
 }

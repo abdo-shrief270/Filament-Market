@@ -31,7 +31,6 @@ class StoreResource extends Resource
                     ->unique(ignoreRecord: true),
                 Forms\Components\Select::make('manager_id')
                     ->relationship('manager', 'name')
-                    ->searchable()
                     ->required(),
             ]);
     }

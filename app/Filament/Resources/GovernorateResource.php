@@ -29,9 +29,6 @@ class GovernorateResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->unique(ignoreRecord: true),
-                Forms\Components\Select::make('country_id')
-                    ->relationship('country', 'name')
-                    ->required(),
             ]);
     }
 
@@ -40,9 +37,6 @@ class GovernorateResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('country.name')
                     ->sortable()
                     ->searchable(),
             ])

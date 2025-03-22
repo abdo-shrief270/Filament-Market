@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ManagerResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Manager::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-user-group';
     protected static ?string $navigationLabel = 'Managers';
@@ -41,11 +41,6 @@ class ManagerResource extends Resource
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('password')
                     ->minLength(8),
-                Forms\Components\TextInput::make('id_number')
-                    ->required()
-                    ->alphaNum()
-                    ->length(14)
-                    ->unique(ignoreRecord: true),
                 Forms\Components\Toggle::make('active'),
             ]);
     }
@@ -62,10 +57,6 @@ class ManagerResource extends Resource
                     ->copyable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
-                    ->sortable()
-                    ->copyable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('id_number')
                     ->sortable()
                     ->copyable()
                     ->searchable(),

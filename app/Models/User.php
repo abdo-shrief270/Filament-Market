@@ -16,14 +16,13 @@ use Spatie\Permission\Traits\HasRoles;
 #[ObservedBy(UserObserver::class)]
 class User extends Authenticatable implements FilamentUser
 {
-    use SoftDeletes,HasFactory, Notifiable,HasRoles;
+    use HasFactory,Notifiable,HasRoles;
 
     protected $fillable = [
         'name',
         'email',
         'phone',
         'password',
-        'id_number',
         'type',
         'governorate_id',
         'active'

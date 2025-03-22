@@ -11,10 +11,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class City extends Model
 {
-    use SoftDeletes;
-    protected $fillable =['name','governorate_id','shipping_cost'];
+    protected $fillable =['name','governorate_id','shipping_cost','default_dMan_id'];
     public function governorate():BelongsTo
     {
         return $this->belongsTo(Governorate::class);
+    }
+    public function delivery_man():BelongsTo
+    {
+        return $this->belongsTo(User::class)->where('type','courier');
     }
 }

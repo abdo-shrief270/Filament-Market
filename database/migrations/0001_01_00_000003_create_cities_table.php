@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('shipping_cost');
             $table->foreignId('governorate_id')->constrained()->cascadeOnDelete();
-            $table->softDeletes();
+//            $table->softDeletes();
             $table->timestamps();
         });
     }

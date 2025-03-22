@@ -12,12 +12,14 @@ class CityObserver
      */
     public function created(City $city): void
     {
-        Notification::make()
-            ->title(__('City') . ' : '.$city->name)
-            ->icon('heroicon-o-map-pin')
-            ->body(__('City Created successfully by').' : '.auth()->user()?->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
+        if(auth()->user()) {
+            Notification::make()
+                ->title(__('City') . ' : ' . $city->name)
+                ->icon('heroicon-o-map-pin')
+                ->body(__('City Created successfully by') . ' : ' . auth()->user()?->name)
+                ->success()
+                ->sendToDatabase(auth()->user());
+        }
     }
 
     /**
@@ -42,32 +44,6 @@ class CityObserver
             ->title(__('City') . ' : '.$city->name)
             ->icon('heroicon-o-map-pin')
             ->body(__('City deleted successfully by').' : '.auth()->user()?->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the City "restored" event.
-     */
-    public function restored(City $city): void
-    {
-        Notification::make()
-            ->title(__('City') . ' : '.$city->name)
-            ->icon('heroicon-o-map-pin')
-            ->body(__('City restored successfully by').' : '.auth()->user()?->name)
-            ->success()
-            ->sendToDatabase(auth()->user());
-    }
-
-    /**
-     * Handle the City "force deleted" event.
-     */
-    public function forceDeleted(City $city): void
-    {
-        Notification::make()
-            ->title(__('City') . ' : '.$city->name)
-            ->icon('heroicon-o-map-pin')
-            ->body(__('City forceDeleted successfully by').' : '.auth()->user()?->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

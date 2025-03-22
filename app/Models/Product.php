@@ -11,16 +11,36 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product extends Model
 {
-    use SoftDeletes;
-
-    protected $fillable = ['name','code','buy_price','net_price','discount_type','discount','price','quantity','category_id','store_id'];
+    protected $fillable = ['name','code','buy_price','net_price','discount_type','discount','price','quantity','store_id'];
 
     public function store() :BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
-    public function category() :BelongsTo
+    public function logs()
     {
-        return $this->belongsTo(Category::class);
+        return $this->hasMany(ProductLog::class);
+    }
+
+    public function increaseStock(int $quantity, string $source, ?int $userId = null)
+    {
+        $this->increment('quantity', $quantity);
+        $this->logs()->create([
+            'type' => 'in',
+            'quantity' => $quantity,
+            'source' => $source,
+            'user_id' => $userId,
+        ]);
+    }
+
+    public function decreaseStock(int $quantity, string $source, ?int $userId = null)
+    {
+        $this->decrement('quantity', $quantity);
+        $this->logs()->create([
+            'type' => 'out',
+            'quantity' => $quantity,
+            'source' => $source,
+            'user_id' => $userId,
+        ]);
     }
 }
