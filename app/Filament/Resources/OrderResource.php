@@ -238,7 +238,14 @@ class OrderResource extends Resource
             ->schema([
                 Forms\Components\Select::make('product_id')
                     ->label('Product')
-                    ->options(Product::query()->pluck('name', 'id'))
+                    ->options(
+                        Product::query()
+                            ->with('store') // Ensure the store relationship is loaded
+                            ->get()
+                            ->mapWithKeys(fn ($product) => [
+                                $product->id => "{$product->name} ({$product->store?->name})"
+                            ])
+                    )
                     ->required()
                     ->reactive()
                     ->afterStateUpdated(fn ($state, Forms\Set $set) => $set('price', Product::find($state)?->price ?? 0))
@@ -269,6 +276,7 @@ class OrderResource extends Resource
                     ->label('Unit Price')
                     ->formatStateUsing(fn (Forms\Get $get)=> Product::find($get('product_id'))?->price ?? 0)
                     ->disabled()
+                    ->hidden(fn () => auth()->user()->hasRole('courier')) // Show only for couriers
                     ->dehydrated()
                     ->numeric()
                     ->columnSpan([
