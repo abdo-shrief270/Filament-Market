@@ -28,8 +28,8 @@ class ListOrders extends ListRecords
     {
         return [
             null => Tab::make('All')->query(fn ($query) => $query),
-            'new' => Tab::make()->query(fn ($query) => $query->where('order_status', 'new')),
-            'processing' => Tab::make()->query(fn ($query) => $query->where('order_status', 'processing')),
+            'new' => Tab::make()->query(fn ($query) => $query->whereIn('order_status',['new','processing'])),
+//            'processing' => Tab::make()->query(fn ($query) => $query->where('order_status', 'processing')),
             'shipped' => Tab::make()->query(fn ($query) => $query->where('order_status', 'shipped')),
             'delivered' => Tab::make()->query(fn ($query) => $query->where('order_status', 'delivered')),
             'cancelled' => Tab::make()->query(fn ($query) => $query->where('order_status', 'cancelled')),

@@ -27,7 +27,7 @@ class StatsOverview extends BaseWidget
                     return ($orderDetail->product->net_price - $orderDetail->product->buy_price) * $orderDetail->quantity;
                 });
             });
-        if (Auth::check() && !Auth::user()->hasRole('courier')) {
+        if (Auth::check() && Auth::user()->hasRole(['super_admin','admin'])) {
             return [
                 // 🔹 USERS & ROLES
                 Stat::make('Total Roles', Role::count())
@@ -115,7 +115,7 @@ class StatsOverview extends BaseWidget
                     ->icon('heroicon-o-banknotes')
                     ->description("Total profit from all orders"),
             ];
-        }else{
+        }elseif(Auth::check() && Auth::user()->hasRole('courier')){
             return[
             Stat::make('Total Orders', Order::where('courier_id',auth()->user()->id)->count())
                 ->color('info')
@@ -133,6 +133,28 @@ class StatsOverview extends BaseWidget
                     ->description("Orders in transit"),
 
                 Stat::make('Closed Orders', Order::where('courier_id',auth()->user()->id)->whereIn('order_status', ['delivered', 'cancelled'])->count())
+                    ->color('success')
+                    ->icon('heroicon-o-check-circle')
+                    ->description("Delivered or cancelled orders"),
+            ];
+        }else{
+            return[
+                Stat::make('Total Orders', Order::count())
+                    ->color('info')
+                    ->icon('heroicon-o-clipboard-document-check')
+                    ->description("All processed orders"),
+
+                Stat::make('Open Orders', Order::whereIn('order_status', ['new', 'processing'])->count())
+                    ->color('danger')
+                    ->icon('heroicon-o-exclamation-circle')
+                    ->description("Pending and processing orders"),
+
+                Stat::make('Shipping Orders', Order::whereIn('order_status', ['shipped'])->count())
+                    ->color('info')
+                    ->icon('heroicon-o-truck')
+                    ->description("Orders in transit"),
+
+                Stat::make('Closed Orders', Order::whereIn('order_status', ['delivered', 'cancelled'])->count())
                     ->color('success')
                     ->icon('heroicon-o-check-circle')
                     ->description("Delivered or cancelled orders"),

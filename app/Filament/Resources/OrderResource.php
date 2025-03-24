@@ -298,7 +298,7 @@ class OrderResource extends Resource
 
                         return ProductResource::getUrl('edit', ['record' => $product]);
                     }, shouldOpenInNewTab: false)
-                    ->hidden(fn (array $arguments, Forms\Components\Repeater $component): bool => blank($component->getRawItemState($arguments['item'])['product_id'])),
+                    ->hidden(fn (array $arguments, Forms\Components\Repeater $component): bool => auth()->user()->hasRole('courier') || blank($component->getRawItemState($arguments['item'])['product_id'])),
             ])
             ->defaultItems(1)
             ->hiddenLabel()
@@ -315,6 +315,12 @@ class OrderResource extends Resource
                 ->dehydrated()
                 ->required()
                 ->maxLength(32)
+                ->columnSpan(
+                    [
+                        'default' =>3,
+                        'sm' => 2,
+                    ]
+                )
                 ->unique(Order::class, 'number', ignoreRecord: true),
 
             Forms\Components\Select::make('customer_id')
@@ -322,6 +328,12 @@ class OrderResource extends Resource
                 ->searchable()
                 ->required()
                 ->reactive()
+                ->columnSpan(
+                    [
+                        'default' =>3,
+                        'sm' => 2,
+                    ]
+                )
                 ->afterStateUpdated(fn ($state, callable $set) =>
                     $set('courier_id', Customer::find($state)?->city?->delivery_man_id)
                 )
@@ -362,9 +374,22 @@ class OrderResource extends Resource
                 ->label('Delivery Man')
                 ->relationship('courier', 'name')
                 ->live()
+                ->hidden(fn () => auth()->user()->hasRole('courier'))
+                ->columnSpan(
+                    [
+                        'default' =>3,
+                        'sm' => 2,
+                    ]
+                )
                 ->required(),
             Forms\Components\TextInput::make('location_link')
                 ->label('Location Link')
+                ->columnSpan(
+                    [
+                        'default' =>3,
+                        'sm' => 2,
+                    ]
+                )
                 ->activeUrl(),
 //            Forms\Components\Select::make('discount_type')
 //                ->options([
