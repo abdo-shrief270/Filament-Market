@@ -46,40 +46,21 @@ class DatabaseSeeder extends Seeder
             'update_product',
             'delete_product',
             'delete_any_product',
-            'view_store',
-            'view_any_store',
-            'create_store',
-            'update_store',
-            'delete_store',
-            'delete_any_store',
         ]);
 
         $courierRole->syncPermissions([
             'view_order',
+            'update_order',
             'view_any_order',
         ]);
 
         $salesRole->syncPermissions([
-            'view_governorate',
-            'view_any_governorate',
-            'create_governorate',
-            'update_governorate',
-            'delete_governorate',
-            'delete_any_governorate',
-
             'view_order',
             'view_any_order',
             'create_order',
             'update_order',
             'delete_order',
             'delete_any_order',
-
-            'view_city',
-            'view_any_city',
-            'create_city',
-            'update_city',
-            'delete_city',
-            'delete_any_city',
 
             'view_customer',
             'view_any_customer',
