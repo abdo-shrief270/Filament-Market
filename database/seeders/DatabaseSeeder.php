@@ -108,7 +108,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('12345678'),
             'active' => true
         ]);
-
+        Artisan::call('shield:super-admin --user=1 --panel=admin');
         $this->command->info("Admins Has Created successfully");
 
         // Create a courier
