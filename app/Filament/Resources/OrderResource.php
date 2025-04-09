@@ -16,6 +16,7 @@ use Filament\Actions\Action;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
+use Filament\Panel;
 use Filament\Resources\Components\Tab;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -71,107 +72,166 @@ class OrderResource extends Resource
             NotesRelationManager::class,
         ];
     }
+
     public static function table(Table $table): Table
     {
         return $table
+            ->deferLoading()
+            ->striped()
+            ->recordUrl(null)
+//            ->recordUrl(
+//                fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record]),
+//            )
             ->columns([
 
-                Tables\Columns\TextColumn::make('customer.name')
-                    ->label('Customer Name')
-                    ->sortable()
-                    ->alignCenter()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('customer.phone')
-                    ->label('Customer Phone')
-                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
-                    ->alignCenter()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('location_link')
-                    ->label('Location Link')
-                    ->icon('heroicon-o-link')
-                    ->formatStateUsing(fn ($state) => $state ? 'Link': 'No Link')
-                    ->url(fn ($state) => filter_var($state, FILTER_VALIDATE_URL) ? $state : Null)
-                    ->openUrlInNewTab()
-                    ->alignCenter()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('courier.name')
-                    ->label('Delivery Name')
-                    ->sortable()
-                    ->hidden(auth()->user()->hasRole('courier'))
-                    ->alignCenter()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('courier.phone')
-                    ->label('Delivery Phone')
-                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
-                    ->hidden(auth()->user()->hasRole('courier'))
-                    ->alignCenter()
-                    ->searchable(),
-//                Tables\Columns\TextColumn::make('discount_type')
-//                    ->alignCenter()
-//                    ->label('Discount Type')
-//                    ->formatStateUsing(fn (string $state): string => $state === 'amount' ? 'EGP' : '%')
-//                    ->sortable()
-//                    ->color(fn (string $state): string => $state === 'amount' ? 'info' : 'danger')
-//                    ->searchable(),
-//
-//                Tables\Columns\TextColumn::make('discount')
-//                    ->label('Discount')
-//                    ->alignCenter()
-//                    ->color(fn ($record): string => $record->discount_color)
-//                    ->sortable()
-//                    ->formatStateUsing(fn ($record): string => $record->discount_display === 'EGP'
-//                        ? number_format($record->discount, 2) . ' EGP'
-//                        : number_format($record->discount, 2) . ' %')
-//                    ->searchable(),
-                Tables\Columns\TextColumn::make('order_price')
-                    ->label('Order Price')
-                    ->sortable()
-                    ->hidden(auth()->user()->hasRole('courier'))
-                    ->alignCenter()
-                    ->alignCenter()
-                    ->color('info')
-                    ->money('egp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('customer.city.shipping_cost')
-                    ->label('Shipping Price')
-                    ->sortable()
-                    ->hidden(auth()->user()->hasRole('courier'))
-                    ->alignCenter()
-                    ->color('danger')
-                    ->money('egp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('total_price')
-                    ->label('Total Price')
-                    ->sortable()
-                    ->alignCenter()
-                    ->color('success')
-                    ->money('egp')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('order_status')
-                    ->badge()
-                    ->alignCenter()
-                    ->label('Order Status')
-                    ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getlabel() : '-')
-                    ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
-                    ->icon(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getIcon() : '-')
-                    ->sortable(),
-            ])
-            ->filters([
-                //
+                Tables\Columns\Layout\Split::make([
+                        Tables\Columns\Layout\Panel::make([
+                            Tables\Columns\TextColumn::make('customer.name')
+                                ->label('Customer Name')
+                                ->sortable()
+                                ->alignLeft()
+                                ->alignJustify()
+                                ->searchable(),
+                            Tables\Columns\TextColumn::make('customer_phone')
+                                ->label('Phone')
+                                ->icon('heroicon-o-phone-arrow-up-right')
+                                ->iconColor('primary')
+                                ->state(fn (Order $record) => $record->customer->phone)
+                                ->formatStateUsing(fn (Order $record) => $record->customer->phone ?'Call': 'No Phone')
+                                ->url(fn (Order $record) => $record->customer->phone ? 'tel:' . $record->customer->phone : null)
+                                ->openUrlInNewTab()
+                                ->weight('bold'),
+
+                            Tables\Columns\TextColumn::make('customer_whatsapp')
+                                ->label('WhatsApp')
+                                ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                                ->iconColor('success')
+                                ->state(fn (Order $record) => $record->customer->phone)
+                                ->formatStateUsing(fn (Order $record) => $record->customer->phone ?'Chat': 'No WhatsApp')
+                                ->url(fn (Order $record) => $record->customer->phone ? 'https://wa.me/+2' . $record->customer->phone : null)
+                                ->openUrlInNewTab()
+                                ->weight('bold')
+                                ->tooltip('Click to chat on WhatsApp'),
+                        ]),
+
+                        Tables\Columns\Layout\Panel::make([
+                            Tables\Columns\TextColumn::make('courier.name')
+                                ->label('Delivery Name')
+                                ->sortable()
+                                ->hidden(auth()->user()->hasRole('courier'))
+                                ->alignLeft()
+                                ->searchable(),
+                            Tables\Columns\TextColumn::make('courier_phone')
+                                ->label('Phone')
+                                ->icon('heroicon-o-phone-arrow-up-right')
+                                ->iconColor('primary')
+                                ->state(fn (Order $record) => $record->courier->phone)
+                                ->formatStateUsing(fn (Order $record) => $record->courier->phone ?'Call': 'No Phone')
+                                ->url(fn (Order $record) => $record->courier->phone ? 'tel:' . $record->courier->phone : null)
+                                ->openUrlInNewTab()
+                                ->weight('bold')
+                                ->hidden(auth()->user()->hasRole('courier')),
+
+                            Tables\Columns\TextColumn::make('courier_whatsapp')
+                                ->label('WhatsApp')
+                                ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                                ->iconColor('success')
+                                ->state(fn (Order $record) => $record->courier->phone)
+                                ->formatStateUsing(fn (Order $record) => $record->courier->phone ?'Chat': 'No WhatsApp')
+                                ->url(fn (Order $record) => $record->courier->phone ? 'https://wa.me/+2' . $record->courier->phone : null)
+                                ->openUrlInNewTab()
+                                ->weight('bold')
+                                ->tooltip('Click to chat on WhatsApp')
+                                ->hidden(auth()->user()->hasRole('courier')),
+                        ])
+                ])->hidden(auth()->user()->hasRole('courier')),
+
+                Tables\Columns\Layout\Panel::make([
+                    Tables\Columns\Layout\Split::make([
+                        Tables\Columns\TextColumn::make('order_price')
+                            ->label('Order Price')
+                            ->icon('heroicon-o-banknotes')
+                            ->iconColor('info')
+                            ->color('info')
+                            ->money('egp')
+                            ->sortable()
+                            ->alignLeft()
+                            ->searchable(),
+
+                        Tables\Columns\TextColumn::make('customer.city.shipping_cost')
+                            ->label('Shipping Price')
+                            ->icon('heroicon-o-truck')
+                            ->iconColor('danger')
+                            ->color('danger')
+                            ->money('egp')
+                            ->sortable()
+                            ->alignLeft()
+                            ->searchable(),
+                        Tables\Columns\TextColumn::make('total_price')
+                            ->label('Total Price')
+                            ->icon('heroicon-o-calculator')
+                            ->iconColor('success')
+                            ->money('egp')
+                            ->color('success')
+                            ->sortable()
+                            ->alignLeft()
+                            ->searchable(),
+                    ])->from('sm'),
+                ])->hidden(auth()->user()->hasRole('courier')),
+
+                Tables\Columns\Layout\Panel::make([
+                    Tables\Columns\Layout\Split::make([
+                        Tables\Columns\TextColumn::make('location_link')
+                            ->label('Location')
+                            ->icon('heroicon-o-map-pin')
+                            ->iconColor('info')
+                            ->tooltip('Click to view location')
+                            ->formatStateUsing(fn ($state) => $state ? 'Location' : 'No Link')
+                            ->url(fn ($state) => filter_var($state, FILTER_VALIDATE_URL) ? $state : null)
+                            ->openUrlInNewTab()
+                            ->alignLeft()
+                            ->searchable(),
+
+                            Tables\Columns\TextColumn::make('order_status')
+                                ->badge()
+                                ->label('Status')
+                                ->icon(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getIcon() : '-')
+                                ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
+                                ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getLabel() : '-')
+                                ->sortable()
+                                ->alignLeft(),
+
+                            Tables\Columns\TextColumn::make('created_at')
+                                ->badge()
+                                ->color('danger')
+                                ->label('Created')
+                                ->since()
+                                ->sortable()
+                                ->alignLeft(),
+                    ])->from('sm'),
+                ]),
+
+            ])->contentGrid([
+                'md' => 1,
+                'xl' => 3,
             ])
             ->actions([
-                Tables\Actions\Action::make('Done')
-                    ->label('Mark as Delivered') // Set button label
-                    ->icon('heroicon-o-check') // Optional: Add an icon
-                    ->color('success') // Green color
-                    ->hidden(fn () => !auth()->user()->hasRole('courier')) // Show only for couriers
+                Tables\Actions\Action::make('Delivered')
+                    ->label('Mark as Delivered')
+                    ->icon('heroicon-o-check')
+                    ->color('success')
+                    ->hidden(fn (Order $order) => !(auth()->user()->hasRole('courier') && $order->order_status!="delivered"))
                     ->action(function (Order $record) {
-                        $record->update(['order_status' => 'delivered']); // Update order status
-                        Notification::make()
-                            ->title('Order Delivered')
-                            ->success()
-                            ->body('The order has been marked as delivered.')
-                            ->send();
+                        $record->update(['order_status' => 'delivered']);
+                    }),
+
+                Tables\Actions\Action::make('Return')
+                    ->label('Return')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('warning') // Green color
+                    ->hidden(fn (Order $order) => !(auth()->user()->hasRole('courier') && $order->order_status=="delivered"))
+                    ->action(function (Order $record) {
+                        $record->update(['order_status' => 'processing']);
                     }),
                 Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
@@ -184,13 +244,30 @@ class OrderResource extends Resource
                         }
                     }
                 }),
-//                    ->hidden(fn ($livewire) => $livewire->activeTab === 'archived'),
-//                Tables\Actions\RestoreAction::make()
-//                    ->visible(fn ($livewire) => $livewire->activeTab === 'archived'),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\BulkAction::make('change_courier')
+                        ->label('Change Delivery Man')
+                        ->icon('heroicon-o-pencil')
+                        ->color('primary')
+                        ->form([
+                            Forms\Components\Select::make('courier_id')
+                                ->label('New Courier')
+                                ->options(\App\Models\User::where('type','courier')->pluck('name', 'id'))
+                                ->required(),
+                        ])
+                        ->action(function (array $data, $records) {
+                            foreach ($records as $record) {
+                                $record->update(['courier_id' => $data['courier_id']]);
+                            }
+
+                            Notification::make()
+                                ->title('The new courier is added')
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ])->emptyStateActions([
                 Tables\Actions\CreateAction::make(),
@@ -214,7 +291,11 @@ class OrderResource extends Resource
     }
     public static function getNavigationBadge(): ?string
     {
-        return static::getModel()::count();
+        if (Auth::check() && !Auth::user()->hasRole('courier')) {
+            return static::getModel()::count();
+        }
+        return static::getModel()::where('courier_id',auth()->user()->id)->count();
+
     }
     public static function getNavigationBadgeColor(): ?string
     {
