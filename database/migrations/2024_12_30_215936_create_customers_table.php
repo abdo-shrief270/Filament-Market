@@ -18,8 +18,6 @@ return new class extends Migration
             $table->string('whatsapp');
             $table->string('email')->nullable();
             $table->integer('buy_count')->default(0);
-            $table->foreignId('city_id')->nullable()->constrained()->nullOnDelete();
-            $table->text('address')->nullable();
 //            $table->softDeletes();
             $table->timestamps();
         });

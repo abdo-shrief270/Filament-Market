@@ -6,7 +6,9 @@ use App\Enums\OrderStatus;
 use App\Filament\Resources\OrderResource\Pages;
 use App\Filament\Resources\OrderResource\RelationManagers\NotesRelationManager;
 use App\Filament\Resources\OrderResource\Widgets\OrderStats;
+use App\Models\City;
 use App\Models\Customer;
+use App\Models\Location;
 use App\Models\Order;
 use App\Models\OrderDetail;
 use App\Models\OrderNote;
@@ -46,6 +48,7 @@ class OrderResource extends Resource
                             ->schema(static::getDetailsFormSchema())
                             ->columns(2),
                         Forms\Components\Section::make('Order items')
+                            ->disabled(auth()->user()->hasRole('courier'))
                             ->schema([
                                 static::getItemsRepeater(),
                             ]),
@@ -83,7 +86,6 @@ class OrderResource extends Resource
 //                fn (Order $record): string => OrderResource::getUrl('edit', ['record' => $record]),
 //            )
             ->columns([
-
                 Tables\Columns\Layout\Split::make([
                         Tables\Columns\Layout\Panel::make([
                             Tables\Columns\TextColumn::make('customer.name')
@@ -118,7 +120,6 @@ class OrderResource extends Resource
                             Tables\Columns\TextColumn::make('courier.name')
                                 ->label('Delivery Name')
                                 ->sortable()
-                                ->hidden(auth()->user()->hasRole('courier'))
                                 ->alignLeft()
                                 ->searchable(),
                             Tables\Columns\TextColumn::make('courier_phone')
@@ -129,8 +130,7 @@ class OrderResource extends Resource
                                 ->formatStateUsing(fn (Order $record) => $record->courier->phone ?'Call': 'No Phone')
                                 ->url(fn (Order $record) => $record->courier->phone ? 'tel:' . $record->courier->phone : null)
                                 ->openUrlInNewTab()
-                                ->weight('bold')
-                                ->hidden(auth()->user()->hasRole('courier')),
+                                ->weight('bold'),
 
                             Tables\Columns\TextColumn::make('courier_whatsapp')
                                 ->label('WhatsApp')
@@ -141,10 +141,9 @@ class OrderResource extends Resource
                                 ->url(fn (Order $record) => $record->courier->phone ? 'https://wa.me/+2' . $record->courier->phone : null)
                                 ->openUrlInNewTab()
                                 ->weight('bold')
-                                ->tooltip('Click to chat on WhatsApp')
-                                ->hidden(auth()->user()->hasRole('courier')),
-                        ])
-                ])->hidden(auth()->user()->hasRole('courier')),
+                                ->tooltip('Click to chat on WhatsApp'),
+                        ])->hidden(auth()->user()->hasRole('courier'))
+                ]),
 
                 Tables\Columns\Layout\Panel::make([
                     Tables\Columns\Layout\Split::make([
@@ -156,9 +155,10 @@ class OrderResource extends Resource
                             ->money('egp')
                             ->sortable()
                             ->alignLeft()
-                            ->searchable(),
+                            ->searchable()
+                            ->hidden(auth()->user()->hasRole('courier')),
 
-                        Tables\Columns\TextColumn::make('customer.city.shipping_cost')
+                        Tables\Columns\TextColumn::make('location.city.shipping_cost')
                             ->label('Shipping Price')
                             ->icon('heroicon-o-truck')
                             ->iconColor('danger')
@@ -166,7 +166,8 @@ class OrderResource extends Resource
                             ->money('egp')
                             ->sortable()
                             ->alignLeft()
-                            ->searchable(),
+                            ->searchable()
+                            ->hidden(auth()->user()->hasRole('courier')),
                         Tables\Columns\TextColumn::make('total_price')
                             ->label('Total Price')
                             ->icon('heroicon-o-calculator')
@@ -177,7 +178,7 @@ class OrderResource extends Resource
                             ->alignLeft()
                             ->searchable(),
                     ])->from('sm'),
-                ])->hidden(auth()->user()->hasRole('courier')),
+                ]),
 
                 Tables\Columns\Layout\Panel::make([
                     Tables\Columns\Layout\Split::make([
@@ -186,28 +187,29 @@ class OrderResource extends Resource
                             ->icon('heroicon-o-map-pin')
                             ->iconColor('info')
                             ->tooltip('Click to view location')
+                            ->state(fn (Order $record) => $record->location->location_link)
                             ->formatStateUsing(fn ($state) => $state ? 'Location' : 'No Link')
                             ->url(fn ($state) => filter_var($state, FILTER_VALIDATE_URL) ? $state : null)
                             ->openUrlInNewTab()
                             ->alignLeft()
                             ->searchable(),
 
-                            Tables\Columns\TextColumn::make('order_status')
-                                ->badge()
-                                ->label('Status')
-                                ->icon(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getIcon() : '-')
-                                ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
-                                ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getLabel() : '-')
-                                ->sortable()
-                                ->alignLeft(),
+                        Tables\Columns\TextColumn::make('order_status')
+                            ->badge()
+                            ->label('Status')
+                            ->icon(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getIcon() : '-')
+                            ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
+                            ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getLabel() : '-')
+                            ->sortable()
+                            ->alignLeft(),
 
-                            Tables\Columns\TextColumn::make('created_at')
-                                ->badge()
-                                ->color('danger')
-                                ->label('Created')
-                                ->since()
-                                ->sortable()
-                                ->alignLeft(),
+                        Tables\Columns\TextColumn::make('created_at')
+                            ->badge()
+                            ->color('danger')
+                            ->label('Created')
+                            ->since()
+                            ->sortable()
+                            ->alignLeft(),
                     ])->from('sm'),
                 ]),
 
@@ -407,7 +409,9 @@ class OrderResource extends Resource
             Forms\Components\Select::make('customer_id')
                 ->relationship('customer', 'name')
                 ->searchable()
+                ->disabled(auth()->user()->hasRole('courier'))
                 ->required()
+                ->live()
                 ->reactive()
                 ->columnSpan(
                     [
@@ -415,9 +419,36 @@ class OrderResource extends Resource
                         'sm' => 2,
                     ]
                 )
-                ->afterStateUpdated(fn ($state, callable $set) =>
-                    $set('courier_id', Customer::find($state)?->city?->delivery_man_id)
-                )
+//                ->afterStateUpdated(function ($state, callable $set){
+//                    $defaultLocationId = \App\Models\Location::where('customer_id',$state)?->where('is_default',true)?->first()?->id;
+////                    dd($defaultLocationId);
+//                    if($defaultLocationId){
+//                        $set('location_id', $defaultLocationId);
+//                        $set('courier_id', Location::find($state)?->city?->delivery_man_id);
+//                    }
+//                })
+                ->afterStateUpdated(function ($state, callable $set,callable $get) {
+
+                    if (!$state) return;
+
+                    // Get default location
+                    $defaultLocation = \App\Models\Location::where('customer_id', $state)
+                        ->where('is_default', true)
+                        ->first()
+                        ?? \App\Models\Location::where('customer_id', $state)->first();
+                    if ($defaultLocation) {
+                        $set('location_id', $defaultLocation->id);
+//                        dd($get('location_id'));
+                        // Set default courier from city of default location
+
+                        if ($defaultLocation->city && $defaultLocation->city->delivery_man_id) {
+                            $set('courier_id', $defaultLocation->city->delivery_man_id);
+                        }
+                    } else {
+                        $set('location_id', null);
+                        $set('courier_id', null);
+                    }
+                })
                 ->createOptionForm([
                     Forms\Components\TextInput::make('name')
                         ->required()
@@ -431,11 +462,10 @@ class OrderResource extends Resource
 
                     Forms\Components\TextInput::make('phone')
                         ->maxLength(255)
-                        ->required()
-                        ->unique(),
+                        ->required(),
 
-                    Forms\Components\Select::make('city_id')
-                        ->relationship('city', 'name')
+                    Forms\Components\TextInput::make('whatsapp')
+                        ->maxLength(255)
                         ->required(),
 
                     Forms\Components\Textarea::make('address')
@@ -450,28 +480,88 @@ class OrderResource extends Resource
                         ->modalSubmitActionLabel('Create customer')
                         ->modalWidth('lg');
                 }),
+            Forms\Components\Select::make('location_id')
+                ->label('Location')
+                ->options(function (callable $get) {
+                    $customerId = $get('customer_id');
+
+                    return $customerId
+                        ? \App\Models\Location::where('customer_id', $customerId)->pluck('title', 'id')
+                        : [];
+                })
+                ->visible(fn (callable $get) => $get('customer_id'))
+                ->live()
+                ->reactive()
+                ->afterStateUpdated(function ($state, callable $set) {
+                    if(is_string($state)){
+                    $location=Location::find($state);
+                    }
+                    else{
+                        $location=$state;
+                    }
+
+                    if ($location && $location->city && $location->city->delivery_man_id) {
+                        $set('courier_id', $location->city->delivery_man_id);
+                    }
+                })
+                ->columnSpan([
+                    'default' => 3,
+                    'sm' => 2,
+                ])
+                ->createOptionForm([
+                    Forms\Components\TextInput::make('title')->label('Location Name'),
+                    Forms\Components\Select::make('city_id')
+                        ->label('City')
+                        ->options(fn()=>City::pluck('name','id'))
+                        ->required(),
+                    Forms\Components\Textarea::make('address')->required(),
+                    Forms\Components\TextInput::make('location_link')
+                        ->label('Location Link'),
+                    Forms\Components\Toggle::make('is_default')->label('Default Pickup Location'),
+                ])
+                ->createOptionUsing(function (array $data, callable $get, callable $set) {
+                    $data['customer_id'] = $get('customer_id');
+                    $location = \App\Models\Location::create($data);
+                    // Auto-set location_id and courier_id after creation
+                    $set('location_id', $location->id);
+                    if ($location->city && $location->city->delivery_man_id) {
+                        $set('courier_id', $location->city->delivery_man_id);
+                    }
+                    return $location;
+                })
+                ->createOptionAction(function (Forms\Components\Actions\Action $action) {
+                    return $action
+                        ->modalHeading('Add New Location')
+                        ->modalSubmitActionLabel('Create')
+                        ->visible(!auth()->user()->hasRole('courier'))
+                        ->modalWidth('lg');
+                })
+                ->required(),
+
+            Forms\Components\Placeholder::make('address')
+                ->label('Address')
+                ->content(fn (Order $record): ?string => $record->location?->address),
 
             Forms\Components\Select::make('courier_id')
                 ->label('Delivery Man')
-                ->relationship('courier', 'name')
+                ->options(function (callable $get) {
+                    $location = $get('location_id');
+                    if(is_int($location)||is_string($location)){
+                        $location=Location::find($location);
+                    }
+                    return $location
+                        ? \App\Models\User::where('type', 'courier')->where('governorate_id',$location->city?->governorate->id)->pluck('name', 'id')
+                        : [];
+                })
+                ->disabled(auth()->user()->hasRole('sales'))
+                ->visible(fn (callable $get) => ($get('customer_id')&&!auth()->user()->hasRole('courier')))
                 ->live()
-                ->hidden(fn () => auth()->user()->hasRole('courier'))
-                ->columnSpan(
-                    [
-                        'default' =>3,
-                        'sm' => 2,
-                    ]
-                )
+                ->columnSpan([
+                    'default' => 3,
+                    'sm' => 2,
+                ])
                 ->required(),
-            Forms\Components\TextInput::make('location_link')
-                ->label('Location Link')
-                ->columnSpan(
-                    [
-                        'default' =>3,
-                        'sm' => 2,
-                    ]
-                )
-                ->activeUrl(),
+
 //            Forms\Components\Select::make('discount_type')
 //                ->options([
 //                    'percentage' => '%',

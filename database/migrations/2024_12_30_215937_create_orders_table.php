@@ -18,8 +18,8 @@ return new class extends Migration
             $table->decimal('total_price')->default(0);
             $table->enum('discount_type',['percentage','amount']);
             $table->decimal('discount')->nullable();
+            $table->foreignId('location_id')->nullable()->constrained('locations','id')->nullOnDelete();
             $table->foreignId('courier_id')->nullable()->constrained('users','id')->nullOnDelete();
-            $table->text('location_link')->nullable();
             $table->enum('order_status',['new','processing','shipped','delivered','cancelled']);
 //            $table->softDeletes();
             $table->timestamps();

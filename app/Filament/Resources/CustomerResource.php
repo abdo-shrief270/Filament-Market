@@ -31,25 +31,16 @@ class CustomerResource extends Resource
                     ->required(),
                 Forms\Components\TextInput::make('phone')
                     ->default(Request::get('phone'))
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                    ->required(),
                 Forms\Components\TextInput::make('whatsapp')
                     ->default(Request::get('phone'))
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                    ->required(),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('buy_count')
                     ->numeric()
                     ->default(0),
-                Forms\Components\Select::make('city_id')
-                    ->relationship('city', 'name')
-                    ->required(),
-                Forms\Components\Textarea::make('address')
-                    ->required()
-                    ->rows(5)
-                    ->autosize()
             ]);
     }
 
@@ -84,14 +75,6 @@ class CustomerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('buy_count')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('city.name')
-                    ->sortable()
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('address')
-//                    ->wrap()
-                    ->limit(50)
-                    ->sortable()
-                    ->searchable(),
             ])
             ->defaultSort('updated_at','desc')
             ->filters([
@@ -126,7 +109,7 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            RelationManagers\LocationRelationManager::class,
         ];
     }
 

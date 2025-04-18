@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\City;
 use App\Models\Customer;
 use App\Models\Governorate;
+use App\Models\Location;
 use App\Models\Manager;
 use App\Models\Product;
 use App\Models\Store;
@@ -126,16 +127,24 @@ class DatabaseSeeder extends Seeder
         $this->command->info("Cities Has Created successfully");
 
         // Create a customer
-        Customer::create([
+        $customer=Customer::create([
             'name' => 'customer 1',
             'phone' => '01000300300',
             'whatsapp' => '01000300300',
             'email' => 'customer@gmail.com',
             'buy_count' => 0,
-            'city_id' => $city->id,
-            'address' => "Address of the Customer one"
+
         ]);
         $this->command->info("Customers Has Created successfully");
+        Location::create([
+            'title'=>'location 1',
+            'location_link'=>'location.com',
+            'customer_id'=>$customer->id,
+            'city_id' => $city->id,
+            'address'=>'Address 1 for first customer',
+
+        ]);
+        $this->command->info("Locations Has Created successfully");
 
         // Create a manager
         $manager = User::create([

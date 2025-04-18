@@ -18,7 +18,7 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_delivery::man');
+        return $user->can('view_any_sales::man');
     }
 
     /**
@@ -29,7 +29,7 @@ class UserPolicy
      */
     public function view(User $user): bool
     {
-        return $user->can('view_delivery::man');
+        return $user->can('view_sales::man');
     }
 
     /**
@@ -40,7 +40,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_delivery::man');
+        return $user->can('create_sales::man');
     }
 
     /**
@@ -51,7 +51,7 @@ class UserPolicy
      */
     public function update(User $user): bool
     {
-        return $user->can('update_delivery::man');
+        return $user->can('update_sales::man');
     }
 
     /**
@@ -62,7 +62,7 @@ class UserPolicy
      */
     public function delete(User $user): bool
     {
-        return $user->can('delete_delivery::man');
+        return $user->can('delete_sales::man');
     }
 
     /**
@@ -73,7 +73,7 @@ class UserPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_delivery::man');
+        return $user->can('delete_any_sales::man');
     }
 
     /**

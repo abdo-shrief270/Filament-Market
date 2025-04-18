@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 #[ObservedBy(OrderObserver::class)]
 class Order extends Model
 {
-    protected $fillable = ['customer_id','location_link','courier_id','order_status','discount_type','discount','number','total_price'];
+    protected $fillable = ['customer_id','location_id','courier_id','order_status','discount_type','discount','number','total_price'];
 
     public function customer():BelongsTo
     {
@@ -40,7 +40,7 @@ class Order extends Model
 
     public function getOrderPriceAttribute(): string
     {
-        return $this->total_price - $this->customer->city->shipping_cost;
+        return $this->total_price - $this->location->city->shipping_cost;
     }
 
     public function details(): HasMany
@@ -67,5 +67,10 @@ class Order extends Model
         }
 
         $this->update(['status' => 'completed']);
+    }
+
+    public function location()
+    {
+        return $this->belongsTo(Location::class);
     }
 }

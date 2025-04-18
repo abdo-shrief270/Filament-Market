@@ -12,10 +12,15 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    protected $fillable =['name','phone','whatsapp','email','buy_count','city_id','address'];
+    protected $fillable =['name','phone','whatsapp','email','buy_count'];
 
-    public function city():BelongsTo
+    public function locations()
     {
-        return $this->belongsTo(City::class);
+        return $this->hasMany(Location::class);
+    }
+
+    public function defaultLocation()
+    {
+        return $this->hasOne(Location::class)->where('is_default', true);
     }
 }
