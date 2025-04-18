@@ -4,12 +4,15 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductResource\Pages;
 use App\Models\Product;
+use App\Models\Store;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Forms;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductResource extends Resource
 {
@@ -28,6 +31,7 @@ class ProductResource extends Resource
             ->schema([
                 Forms\Components\Select::make('store_id')
                     ->relationship('store', 'name')
+                    ->hidden(auth()->user()->hasRole('manager'))
                     ->required(),
                 Forms\Components\TextInput::make('name')
                     ->required()
@@ -106,6 +110,7 @@ class ProductResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('store.name')
                     ->sortable()
+                    ->hidden(auth()->user()->hasRole('manager'))
                     ->searchable(),
             ])
             ->defaultSort('updated_at','desc')
@@ -148,15 +153,27 @@ class ProductResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-
-    public static function getNavigationBadge(): ?string
+    public static function getEloquentQuery(): Builder
     {
-        return static::getModel()::count();
+        if (Auth::check() && !Auth::user()->hasRole('manager')) {
+            return parent::getEloquentQuery();
+        }
+        return parent::getEloquentQuery()->where('store_id',Store::where('manager_id',auth()->user()->id)->first()->id);
     }
     public static function getNavigationBadgeColor(): ?string
     {
         return static::getModel()::count() > 10 ? 'warning' : 'primary';
     }
+
+    public static function getNavigationBadge(): ?string
+    {
+        if (Auth::check() && !Auth::user()->hasRole('manager')) {
+            return static::getModel()::count();
+        }
+        return static::getModel()::where('store_id',Store::where('manager_id',auth()->user()->id)->first()->id)->count();
+
+    }
+
     public static function getRelations(): array
     {
         return [

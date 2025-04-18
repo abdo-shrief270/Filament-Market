@@ -540,7 +540,8 @@ class OrderResource extends Resource
 
             Forms\Components\Placeholder::make('address')
                 ->label('Address')
-                ->content(fn (Order $record): ?string => $record->location?->address),
+                ->visibleOn('view')
+                ->content(fn (Order $record): ?string => $record?->location?->address),
 
             Forms\Components\Select::make('courier_id')
                 ->label('Delivery Man')
