@@ -11,6 +11,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Request;
 
 class CustomerResource extends Resource
 {
@@ -29,6 +30,11 @@ class CustomerResource extends Resource
                 Forms\Components\TextInput::make('name')
                     ->required(),
                 Forms\Components\TextInput::make('phone')
+                    ->default(Request::get('phone'))
+                    ->required()
+                    ->unique(ignoreRecord: true),
+                Forms\Components\TextInput::make('whatsapp')
+                    ->default(Request::get('phone'))
                     ->required()
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('email')
@@ -56,9 +62,22 @@ class CustomerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Customer Phone')
-                    ->formatStateUsing(fn ($state) => view('components.phone-links', ['phone' => $state])) // Custom Blade View
-                    ->alignCenter()
-                    ->searchable(),
+                    ->icon('heroicon-o-phone-arrow-up-right')
+                    ->iconColor('primary')
+                    ->state(fn (Customer $record) => $record->phone)
+                    ->formatStateUsing(fn (Customer $record) => $record->phone ?'Call': 'No Phone')
+                    ->url(fn (Customer $record) => $record->phone ? 'tel:' . $record->phone : null)
+                    ->openUrlInNewTab()
+                    ->weight('bold'),
+                Tables\Columns\TextColumn::make('whatsapp')
+                    ->label('Customer Whatsapp')
+                    ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                    ->iconColor('success')
+                    ->state(fn (Customer $record) => $record->whatsapp)
+                    ->formatStateUsing(fn (Customer $record) => $record->whatsapp ?'Chat': 'No whatsapp')
+                    ->url(fn (Customer $record) => $record->whatsapp ? 'tel:' . $record->whatsapp : null)
+                    ->openUrlInNewTab()
+                    ->weight('bold'),
                 Tables\Columns\TextColumn::make('email')
                     ->sortable()
                     ->url(fn ($state) =>'mailto:'.$state)

@@ -61,7 +61,10 @@ class DatabaseSeeder extends Seeder
             'update_order',
             'delete_order',
             'delete_any_order',
-
+            'view_city',
+            'view_any_city',
+            'view_governorate',
+            'view_any_governorate',
             'view_customer',
             'view_any_customer',
             'create_customer',
@@ -124,8 +127,9 @@ class DatabaseSeeder extends Seeder
 
         // Create a customer
         Customer::create([
-            'name' => 'عميل 1',
+            'name' => 'customer 1',
             'phone' => '01000300300',
+            'whatsapp' => '01000300300',
             'email' => 'customer@gmail.com',
             'buy_count' => 0,
             'city_id' => $city->id,
