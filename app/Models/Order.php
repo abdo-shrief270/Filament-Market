@@ -54,17 +54,17 @@ class Order extends Model
 
     public function markAsCancelled()
     {
-        foreach($this->details as $detail) {
-            $detail->product->addStock($detail->quantity, 'cancellation', auth()->id());
-        }
+//        foreach($this->details as $detail) {
+//            $detail->product->addStock($detail->quantity, 'cancellation', auth()->id());
+//        }
 
         $this->update(['status' => 'cancelled']);
     }
     public function markAsCompleted()
     {
-        foreach ($this->details as $detail) {
-            $detail->product->removeStock($detail->quantity, 'order', auth()->id());
-        }
+//        foreach ($this->details as $detail) {
+//            $detail->product->removeStock($detail->quantity, 'order', auth()->id());
+//        }
 
         $this->update(['status' => 'completed']);
     }

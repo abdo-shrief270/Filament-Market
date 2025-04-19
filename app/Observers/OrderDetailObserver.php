@@ -42,22 +42,28 @@ class OrderDetailObserver
      */
     public function updated(OrderDetail $detail): void
     {
-//        $product = Product::find($detail->product_id);
-//        $originalQuantity = $detail->getOriginal('quantity'); // Previous quantity
-//        $newQuantity = $detail->quantity; // New quantity
-//
-//        if (!$product) {
-//            throw new \Exception("Product not found.");
-//        }
-//
-//        $stockAdjustment = $newQuantity - $originalQuantity; // Difference
-//
-//        if ($stockAdjustment > 0 && $product->quantity < $stockAdjustment) {
-//            throw new \Exception("Not enough stock available.");
-//        }
-//
-//        // Adjust stock based on the update
-//        $product->decrement('quantity', $stockAdjustment);
+        $product = Product::find($detail->product_id);
+        $originalQuantity = $detail->getOriginal('quantity'); // Previous quantity
+        $newQuantity = $detail->quantity; // New quantity
+
+        if (!$product) {
+            throw new \Exception("Product not found.");
+        }
+
+        $stockAdjustment = $newQuantity - $originalQuantity; // Difference
+        if ($stockAdjustment > 0 && $product->quantity < $stockAdjustment) {
+            throw new \Exception("Not enough stock available.");
+        }
+
+        $stockAdjustment = $newQuantity - $originalQuantity;
+        if(($detail->order->order_status=='shipped' || $detail->order->order_status=='delivered')){
+            if($stockAdjustment<0){
+                $product->increaseStock(abs($stockAdjustment), "Order detail's Quantity decreased", auth()->id());
+            }elseif($stockAdjustment>0){
+                $product->decreaseStock(abs($stockAdjustment), "Order detail's Quantity increased", auth()->id());
+            }
+        }
+
 
         $order = Order::find($detail->order_id);
         OrderUpdated::dispatch($order);

@@ -19,11 +19,11 @@ class OrderUpdated
             foreach (OrderDetail::where('order_id',$order->id)->get() as $item){
                 $total_price += $item->product->price * $item->quantity;
             }
-            if($order->discount_type=='amount'){
-                $total_price -= $order->discount;
-            }else{
-                $total_price *= 1-($order->discount/100);
-            }
+//            if($order->discount_type=='amount'){
+//                $total_price -= $order->discount;
+//            }else{
+//                $total_price *= 1-($order->discount/100);
+//            }
             Order::where('id',$order->id)->update(
                 [
                     'total_price' => $total_price + $order->location->city->shipping_cost

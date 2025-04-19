@@ -32,27 +32,38 @@ class OrderObserver
     public function updated(Order $order): void
     {
         OrderUpdated::dispatch($order);
-        // Check if the status changed to "delivered"
-        if ($order->isDirty('order_status') && $order->order_status === 'delivered') {
-            foreach ($order->details as $detail) {
-                $product = $detail->product;
-                if ($product) {
-                    $product->decreaseStock($detail->quantity, 'delivered order', auth()->id());
+
+        $originalStatus = $order->getOriginal('order_status');
+        $newStatus = $order->order_status;
+
+        if ($order->isDirty('order_status')) {
+            // From non-shipped → shipped/delivered (decrease stock)
+            if ($originalStatus !== 'shipped' && $originalStatus !== 'delivered' &&
+                ($newStatus === 'shipped' || $newStatus === 'delivered')) {
+                foreach ($order->details as $detail) {
+                    $product = $detail->product;
+                    if ($product) {
+                        $product->decreaseStock($detail->quantity, 'Order shipped/delivered', auth()->id());
+                    }
+                }
+            }
+
+            // From shipped/delivered → cancelled/returned (increase stock)
+            if (($originalStatus === 'shipped' || $originalStatus === 'delivered') &&
+                ($newStatus !== 'shipped' && $newStatus !== 'delivered')) {
+                foreach ($order->details as $detail) {
+                    $product = $detail->product;
+                    if ($product) {
+                        $product->increaseStock($detail->quantity, 'Order cancelled/returned', auth()->id());
+                    }
                 }
             }
         }
-        if ($order->isDirty('order_status') && $order->order_status === 'cancelled') {
-            foreach ($order->details as $detail) {
-                $product = $detail->product;
-                if ($product) {
-                    $product->increaseStock($detail->quantity, 'cancelled order', auth()->id());
-                }
-            }
-        }
+
         Notification::make()
-            ->title(__('Order') . ' : '.$order->id)
+            ->title(__('Order') . ' : ' . $order->id)
             ->icon('heroicon-o-shopping-bag')
-            ->body(__('Order updated successfully by').' : '.auth()->user()->name)
+            ->body(__('Order updated successfully by') . ' : ' . auth()->user()->name)
             ->success()
             ->sendToDatabase(auth()->user());
     }

@@ -591,6 +591,7 @@ class OrderResource extends Resource
                 ->inline()
                 ->options(OrderStatus::class)
                 ->default(OrderStatus::New)
+                ->hiddenOn('create')
                 ->columnSpan(2)
                 ->required(),
         ];
