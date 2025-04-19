@@ -34,7 +34,6 @@ class SalesManResource extends Resource
                     ->required()
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('email')
-                    ->required()
                     ->email()
                     ->unique(ignoreRecord: true),
                 Forms\Components\TextInput::make('password')
