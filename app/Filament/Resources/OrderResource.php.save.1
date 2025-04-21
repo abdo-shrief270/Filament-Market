@@ -290,7 +290,7 @@ class OrderResource extends Resource
             return parent::getEloquentQuery()->withoutGlobalScope(SoftDeletingScope::class);
         }
         return parent::getEloquentQuery()->where('courier_id',auth()->user()->id);
-    }
+    
     public static function getNavigationBadge(): ?string
     {
         if (Auth::check() && !Auth::user()->hasRole('courier')) {
