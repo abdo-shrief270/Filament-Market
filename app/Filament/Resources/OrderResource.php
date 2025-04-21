@@ -476,9 +476,10 @@ class OrderResource extends Resource
                         ->maxLength(255)
                         ->required(),
 
-                    Forms\Components\Textarea::make('address')
-                        ->rows(5)
-                        ->autosize()
+
+//                    Forms\Components\Textarea::make('address')
+//                        ->rows(5)
+//                        ->autosize()
 
 
                 ])
@@ -500,18 +501,18 @@ class OrderResource extends Resource
                 ->visible(fn (callable $get) => $get('customer_id'))
                 ->live()
                 ->reactive()
-                ->afterStateUpdated(function ($state, callable $set) {
-                    if(is_string($state)){
-                    $location=Location::find($state);
-                    }
-                    else{
-                        $location=$state;
-                    }
-
-                    if ($location && $location->city && $location->city->delivery_man_id) {
-                        $set('courier_id', $location->city->delivery_man_id);
-                    }
-                })
+//                ->afterStateUpdated(function ($state, callable $set) {
+//                    if(is_string($state)){
+//                    $location=Location::find($state);
+//                    }
+//                    else{
+//                        $location=$state;
+//                    }
+//
+//                    if ($location && $location->city && $location->city->delivery_man_id) {
+//                        $set('courier_id', $location->city->delivery_man_id);
+//                    }
+//                })
                 ->columnSpan([
                     'default' => 3,
                     'sm' => 2,
