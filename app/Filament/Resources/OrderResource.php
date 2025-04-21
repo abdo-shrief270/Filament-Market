@@ -186,20 +186,19 @@ class OrderResource extends Resource
                             ->label('Location')
                             ->icon('heroicon-o-map-pin')
                             ->iconColor('info')
-                            ->tooltip('Click to view location')
-                            ->state(fn (Order $record) => $record->location->location_link)
-                            ->formatStateUsing(fn ($state) => $state ? 'Location' : 'No Link')
-                            ->url(fn ($state) => filter_var($state, FILTER_VALIDATE_URL) ? $state : null)
+                            ->getStateUsing(fn (Order $record) => optional($record->location)->location_link)
+                            ->formatStateUsing(fn ($state) => !empty($state) ? 'View Location' : 'No Link')
+                            ->url(function ($state) {
+                                if (empty($state)) return null;
+                                return $state;
+                            })
                             ->openUrlInNewTab()
                             ->alignLeft()
                             ->searchable(),
 
-                        Tables\Columns\TextColumn::make('order_status')
-                            ->badge()
+                        Tables\Columns\SelectColumn::make('order_status')
                             ->label('Status')
-                            ->icon(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getIcon() : '-')
-                            ->color(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getColor() : '-')
-                            ->formatStateUsing(fn ($state) => $state ? \App\Enums\OrderStatus::from($state)->getLabel() : '-')
+                            ->options(OrderStatus::class)
                             ->sortable()
                             ->alignLeft(),
 
@@ -491,33 +490,37 @@ class OrderResource extends Resource
                 }),
             Forms\Components\Select::make('location_id')
                 ->label('Location')
-                ->options(function (callable $get) {
-                    $customerId = $get('customer_id');
-
-                    return $customerId
-                        ? \App\Models\Location::where('customer_id', $customerId)->pluck('title', 'id')
-                        : [];
-                })
+                ->relationship('location','title')
+//                ->options(function (callable $get) {
+//                    $customerId = $get('customer_id');
+//
+//                    return $customerId
+//                        ? \App\Models\Location::where('customer_id', $customerId)->pluck('title', 'id')
+//                        : [];
+//                })
                 ->visible(fn (callable $get) => $get('customer_id'))
                 ->live()
                 ->reactive()
-//                ->afterStateUpdated(function ($state, callable $set) {
-//                    if(is_string($state)){
-//                    $location=Location::find($state);
-//                    }
-//                    else{
-//                        $location=$state;
-//                    }
-//
-//                    if ($location && $location->city && $location->city->delivery_man_id) {
-//                        $set('courier_id', $location->city->delivery_man_id);
-//                    }
-//                })
+                ->afterStateUpdated(function ($state, callable $set) {
+                    if(is_string($state)||is_int($state)){
+                        $location=Location::find($state);
+                    }
+                    else{
+                        $location=$state;
+                    }
+
+                    if ($location && $location->city && $location->city->delivery_man_id) {
+                        $set('courier_id', $location->city->delivery_man_id);
+                    }
+                })
                 ->columnSpan([
                     'default' => 3,
                     'sm' => 2,
                 ])
                 ->createOptionForm([
+                    Forms\Components\Select::make('customer_id')
+                        ->relationship('customer', 'name')
+                        ->required(),
                     Forms\Components\TextInput::make('title')->label('Location Name'),
                     Forms\Components\Select::make('city_id')
                         ->label('City')
@@ -528,21 +531,10 @@ class OrderResource extends Resource
                         ->label('Location Link'),
                     Forms\Components\Toggle::make('is_default')->label('Default Pickup Location'),
                 ])
-                ->createOptionUsing(function (array $data, callable $get, callable $set) {
-                    $data['customer_id'] = $get('customer_id');
-                    $location = \App\Models\Location::create($data);
-                    // Auto-set location_id and courier_id after creation
-                    $set('location_id', $location->id);
-                    if ($location->city && $location->city->delivery_man_id) {
-                        $set('courier_id', $location->city->delivery_man_id);
-                    }
-                    return $location;
-                })
                 ->createOptionAction(function (Forms\Components\Actions\Action $action) {
                     return $action
-                        ->modalHeading('Add New Location')
-                        ->modalSubmitActionLabel('Create')
-                        ->visible(!auth()->user()->hasRole('courier'))
+                        ->modalHeading('Create location')
+                        ->modalSubmitActionLabel('Create location')
                         ->modalWidth('lg');
                 })
                 ->required(),
