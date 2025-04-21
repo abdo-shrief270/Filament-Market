@@ -405,7 +405,15 @@ class OrderResource extends Resource
                     ]
                 )
                 ->unique(Order::class, 'number', ignoreRecord: true),
-
+            Forms\Components\Textarea::make('note')
+            ->columns(3)
+                ->columnSpan(
+                    [
+                        'default' =>3,
+                        'sm' => 2,
+                    ]
+                )
+            ->rows(5),
             Forms\Components\Select::make('customer_id')
                 ->relationship('customer', 'name')
                 ->searchable()
