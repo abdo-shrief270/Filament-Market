@@ -541,6 +541,10 @@ class OrderResource extends Resource
             Forms\Components\Placeholder::make('address')
                 ->label('Address')
                 ->visibleOn('view')
+                ->columnSpan([
+                    'default' => 3,
+                    'sm' => 2,
+                ])
                 ->content(fn (Order $record): ?string => $record?->location?->address),
 
             Forms\Components\Select::make('courier_id')
@@ -554,7 +558,15 @@ class OrderResource extends Resource
                         ? \App\Models\User::where('type', 'courier')->where('governorate_id',$location->city?->governorate->id)->pluck('name', 'id')
                         : [];
                 })
-                
+//                ->default(function (callable $get) {
+//                    $location = $get('location_id');
+//                    if(is_int($location)||is_string($location)){
+//                        $location=Location::find($location);
+//                    }
+//                    return $location
+//                        ? \App\Models\User::where('type', 'courier')->where('governorate_id',$location->city?->governorate->id)->pluck('name', 'id')
+//                        : [];
+//                })
                 ->visible(fn (callable $get) => ($get('customer_id')&&!auth()->user()->hasRole('courier')))
                 ->live()
                 ->columnSpan([
