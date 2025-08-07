@@ -536,8 +536,7 @@ class OrderResource extends Resource
                         ->modalHeading('Create location')
                         ->modalSubmitActionLabel('Create location')
                         ->modalWidth('lg');
-                })
-                ->required(),
+                }),
 
             Forms\Components\Placeholder::make('address')
                 ->label('Address')
@@ -573,8 +572,7 @@ class OrderResource extends Resource
                 ->columnSpan([
                     'default' => 3,
                     'sm' => 2,
-                ])
-                ->required(),
+                ]),
 
 //            Forms\Components\Select::make('discount_type')
 //                ->options([
