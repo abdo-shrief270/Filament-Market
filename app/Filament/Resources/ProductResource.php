@@ -34,11 +34,9 @@ class ProductResource extends Resource
                     ->hidden(auth()->user()->hasRole('manager'))
                     ->required(),
                 Forms\Components\TextInput::make('name')
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                    ->required(),
                 Forms\Components\TextInput::make('code')
-                    ->required()
-                    ->unique(ignoreRecord: true),
+                    ->required(),
                 Forms\Components\TextInput::make('buy_price')
                     ->numeric()
                     ->gte(0)
