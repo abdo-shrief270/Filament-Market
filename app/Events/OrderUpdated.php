@@ -26,7 +26,7 @@ class OrderUpdated
 //            }
             Order::where('id',$order->id)->update(
                 [
-                    'total_price' => $total_price + $order->location->city->shipping_cost
+                    'total_price' => $total_price + $order->location?->city?->shipping_cost
                 ]
             );
         }
