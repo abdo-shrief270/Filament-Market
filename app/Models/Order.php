@@ -40,7 +40,7 @@ class Order extends Model
 
     public function getOrderPriceAttribute(): string
     {
-        return $this->total_price - $this->location->city->shipping_cost;
+        return $this->total_price - $this->location?->city?->shipping_cost;
     }
 
     public function details(): HasMany
