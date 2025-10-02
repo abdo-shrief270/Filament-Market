@@ -416,6 +416,8 @@ class OrderResource extends Resource
             Forms\Components\Select::make('customer_id')
                 ->relationship('customer', 'name')
                 ->searchable()
+                ->getSearchResultsUsing(fn (string $search): array => Customer::where('name', 'like', "%{$search}%")->orWhere('phone', 'like', "%{$search}%")->orWhere('whatsapp', 'like', "%{$search}%")->limit(50)->pluck('name', 'id')->toArray())
+                ->getOptionLabelUsing(fn ($value): ?string => Customer::find($value)?->name)
                 ->disabled(auth()->user()->hasRole('courier'))
                 ->required()
                 ->live()

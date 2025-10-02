@@ -53,6 +53,7 @@ class CustomerResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('phone')
                     ->label('Customer Phone')
+                    ->searchable()
                     ->icon('heroicon-o-phone-arrow-up-right')
                     ->iconColor('primary')
                     ->state(fn (Customer $record) => $record->phone)
@@ -62,6 +63,7 @@ class CustomerResource extends Resource
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('whatsapp')
                     ->label('Customer Whatsapp')
+                    ->searchable()
                     ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
                     ->iconColor('success')
                     ->state(fn (Customer $record) => $record->whatsapp)
