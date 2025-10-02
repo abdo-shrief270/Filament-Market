@@ -68,7 +68,7 @@ class CustomerResource extends Resource
                     ->iconColor('success')
                     ->state(fn (Customer $record) => $record->whatsapp)
                     ->formatStateUsing(fn (Customer $record) => $record->whatsapp ?'Chat': 'No whatsapp')
-                    ->url(fn (Customer $record) => $record->whatsapp ? 'tel:' . $record->whatsapp : null)
+                    ->url(fn (Customer $record) => $record->whatsapp ? 'https://api.whatsapp.com/send?phone=2' . $record->whatsapp : null)
                     ->openUrlInNewTab()
                     ->weight('bold'),
                 Tables\Columns\TextColumn::make('email')
