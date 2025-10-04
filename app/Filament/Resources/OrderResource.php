@@ -522,11 +522,13 @@ class OrderResource extends Resource
                 ->createOptionForm([
                     Forms\Components\Select::make('customer_id')
                         ->relationship('customer', 'name')
+                        ->searchable()
                         ->required(),
                     Forms\Components\TextInput::make('title')->label('Location Name'),
                     Forms\Components\Select::make('city_id')
                         ->label('City')
                         ->options(fn()=>City::pluck('name','id'))
+                        ->searchable()
                         ->required(),
                     Forms\Components\Textarea::make('address')->required(),
                     Forms\Components\TextInput::make('location_link')
@@ -558,7 +560,7 @@ class OrderResource extends Resource
                     }
                     return $location
                         ? \App\Models\User::where('type', 'courier')->where('governorate_id',$location->city?->governorate->id)->pluck('name', 'id')
-                        : [];
+                        : \App\Models\User::where('type', 'courier')->pluck('name', 'id');
                 })
 //                ->default(function (callable $get) {
 //                    $location = $get('location_id');

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
             $table->string('number');
+            $table->text('note')->nullable();
             $table->foreignId('customer_id')->nullable()->constrained()->nullOnDelete();
             $table->decimal('total_price')->default(0);
             $table->enum('discount_type',['percentage','amount']);

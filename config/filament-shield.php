@@ -45,6 +45,14 @@ return [
         'widget' => 'widget',
     ],
 
+    'permissions' => [
+        'resources' => [
+            'Order' => [
+                'edit_location',
+            ],
+        ],
+    ],
+
     'entities' => [
         'pages' => true,
         'widgets' => true,
