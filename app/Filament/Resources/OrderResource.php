@@ -474,15 +474,27 @@ class OrderResource extends Resource
                         ->required(),
 
                     Forms\Components\TextInput::make('whatsapp')
-                        ->maxLength(255)
-                        ->required(),
+                        ->maxLength(255),
 
 
-//                    Forms\Components\Textarea::make('address')
-//                        ->rows(5)
-//                        ->autosize()
-
-
+                    Forms\Components\Repeater::make('locations')
+                        ->label('Customer Locations')
+                        ->relationship() // Automatically uses the hasMany('locations') relation in Customer model
+                        ->schema([
+                            Forms\Components\TextInput::make('title')->label('Location Name')->required(),
+                            Forms\Components\Select::make('city_id')
+                                ->label('City')
+                                ->options(fn () => \App\Models\City::pluck('name', 'id'))
+                                ->searchable()
+                                ->required(),
+                            Forms\Components\Textarea::make('address')->required(),
+                            Forms\Components\TextInput::make('location_link')->label('Location Link'),
+                            Forms\Components\Toggle::make('is_default')->label('Default Pickup Location'),
+                        ])
+                        ->defaultItems(0)
+                        ->itemLabel('Add Location')
+                        ->columns(1)
+                        ->collapsed(),
                 ])
                 ->createOptionAction(function (Forms\Components\Actions\Action $action) {
                     return $action
@@ -493,14 +505,14 @@ class OrderResource extends Resource
             Forms\Components\Select::make('location_id')
                 ->label('Location')
                 ->relationship('location','title')
-//                ->options(function (callable $get) {
-//                    $customerId = $get('customer_id');
-//
-//                    return $customerId
-//                        ? \App\Models\Location::where('customer_id', $customerId)->pluck('title', 'id')
-//                        : [];
-//                })
-                ->visible(fn (callable $get) => $get('customer_id'))
+                ->options(function (callable $get) {
+                    $customerId = $get('customer_id');
+
+                    return $customerId
+                        ? \App\Models\Location::where('customer_id', $customerId)->pluck('title', 'id')
+                        : [];
+                })
+                ->visible(fn (Forms\Get $get) => $get('customer_id'))
                 ->live()
                 ->reactive()
                 ->afterStateUpdated(function ($state, callable $set) {
@@ -523,6 +535,8 @@ class OrderResource extends Resource
                     Forms\Components\Select::make('customer_id')
                         ->relationship('customer', 'name')
                         ->searchable()
+                        ->getSearchResultsUsing(fn (string $search): array => Customer::where('name', 'like', "%{$search}%")->orWhere('phone', 'like', "%{$search}%")->orWhere('whatsapp', 'like', "%{$search}%")->limit(50)->pluck('name', 'id')->toArray())
+                        ->getOptionLabelUsing(fn ($value): ?string => Customer::find($value)?->name)
                         ->required(),
                     Forms\Components\TextInput::make('title')->label('Location Name'),
                     Forms\Components\Select::make('city_id')

@@ -33,8 +33,7 @@ class CustomerResource extends Resource
                     ->default(Request::get('phone'))
                     ->required(),
                 Forms\Components\TextInput::make('whatsapp')
-                    ->default(Request::get('phone'))
-                    ->required(),
+                    ->default(Request::get('phone')),
                 Forms\Components\TextInput::make('email')
                     ->email()
                     ->unique(ignoreRecord: true),
