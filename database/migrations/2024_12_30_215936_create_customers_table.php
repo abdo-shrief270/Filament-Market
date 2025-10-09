@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('phone');
-            $table->string('whatsapp');
+            $table->string('whatsapp')->nullable();
             $table->string('email')->nullable();
             $table->integer('buy_count')->default(0);
 //            $table->softDeletes();
